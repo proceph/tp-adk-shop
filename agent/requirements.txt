@@ -1,0 +1,5 @@
+# Versions figées : un TP ne doit pas casser parce qu'une release sort la veille.
+google-adk[mcp]==2.9.0
+httpx==0.28.1
+psycopg[binary]==3.2.10
+pytest==8.4.2

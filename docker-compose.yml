@@ -1,0 +1,91 @@
+name: tp-adk-shop
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: shop
+      POSTGRES_PASSWORD: shop
+      POSTGRES_DB: shop
+    ports:
+      - "5432:5432"
+    volumes:
+      # Les scripts s'exécutent dans l'ordre alphabétique, une seule fois,
+      # à la création du volume. `make reset` supprime le volume pour rejouer.
+      - ./db/01_schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+      - ./db/02_seed.sql:/docker-entrypoint-initdb.d/02_seed.sql:ro
+      - ./db/03_grants.sql:/docker-entrypoint-initdb.d/03_grants.sql:ro
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shop -d shop"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build: ./api
+    environment:
+      DATABASE_URL: postgresql://shop:shop@db:5432/shop
+      SHOP_API_KEY: ${SHOP_API_KEY:-tp-adk-2026}
+    ports:
+      # Depuis ton navigateur : http://localhost:8080
+      # Depuis le conteneur agent : http://api:8000   <-- piège classique
+      - "8080:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  adminer:
+    image: adminer:5
+    ports:
+      - "8081:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+    depends_on:
+      db:
+        condition: service_healthy
+
+  agent:
+    build: ./agent
+    environment:
+      # Vide = adk web démarre quand même, mais l'agent répondra une erreur au
+      # premier message. `make preflight` te prévient avant.
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+      GOOGLE_GENAI_USE_VERTEXAI: "FALSE"
+      SHOP_API_URL: http://api:8000
+      SHOP_API_KEY: ${SHOP_API_KEY:-tp-adk-2026}
+      # Identifiants LECTURE SEULE pour les tools SQL du palier 2
+      SHOP_DB_URL: postgresql://student:student@db:5432/shop
+      MCP_SERVER_URL: http://mcp:9000/mcp
+    ports:
+      - "8000:8000"
+    volumes:
+      # C'est ICI que tu travailles : édite dans ton IDE, le conteneur voit tes
+      # changements immédiatement (adk web recharge à chaque requête).
+      - ./agent/shop_agent:/app/shop_agent
+      - ./tests:/app/tests
+    depends_on:
+      api:
+        condition: service_healthy
+
+  mcp:
+    # Palier 4 seulement : `make mcp` (ou docker compose --profile mcp up -d mcp)
+    profiles: ["mcp"]
+    build: ./mcp_server
+    environment:
+      SHOP_DB_URL: postgresql://student:student@db:5432/shop
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./mcp_server/server.py:/app/server.py
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  db_data:
