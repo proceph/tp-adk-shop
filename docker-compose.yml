@@ -80,7 +80,9 @@ services:
     environment:
       SHOP_DB_URL: postgresql://student:student@db:5432/shop
     ports:
-      - "9000:9000"
+      # 9090 côté hôte : le port 9000 est souvent déjà pris (php-fpm, portainer…).
+      # Le conteneur agent, lui, joint toujours http://mcp:9000/mcp.
+      - "9090:9000"
     volumes:
       - ./mcp_server/server.py:/app/server.py
     depends_on:
