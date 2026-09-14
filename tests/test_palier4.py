@@ -11,7 +11,13 @@ pytestmark = pytest.mark.palier4
 
 
 def _tools():
-    from shop_agent.tools_mcp import shop_mcp_toolset
+    try:
+        from shop_agent.tools_mcp import shop_mcp_toolset
+    except ImportError:
+        pytest.fail(
+            "shop_agent/tools_mcp.py ne définit pas encore `shop_mcp_toolset`.\n"
+            "Palier 4 : crée le McpToolset qui pointe vers ton serveur MCP."
+        )
 
     async def run():
         try:
