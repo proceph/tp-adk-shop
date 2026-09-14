@@ -92,8 +92,19 @@ def test_l_instruction_protege_la_commande():
     """Un tool d'écriture sans garde-fou dans l'instruction, c'est un accident qui attend."""
     from shop_agent.agent import root_agent
 
-    instruction = (root_agent.instruction or "").lower()
-    assert any(mot in instruction for mot in ("confirm", "valide")), (
+    instruction = root_agent.instruction or ""
+
+    assert "TODO" not in instruction, (
+        "Il reste un TODO dans l'INSTRUCTION de ton agent. Le palier 3 ne se joue "
+        "pas qu'en Python : remplace les consignes par les vraies règles que "
+        "l'agent doit suivre avant de passer une commande."
+    )
+    minuscules = instruction.lower()
+    assert any(mot in minuscules for mot in ("confirm", "valide")), (
         "L'instruction de l'agent doit lui imposer une confirmation explicite de "
         "l'utilisateur avant d'appeler create_order."
+    )
+    assert "check_stock" in minuscules, (
+        "L'instruction doit aussi lui imposer de vérifier le stock AVANT de "
+        "commander : le modèle ne le fera pas spontanément."
     )
