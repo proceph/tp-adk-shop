@@ -37,7 +37,6 @@ installation de Python, de PostgreSQL ou de dépendance n'est requise.
 | API REST | 8 routes : catalogue, clients, commandes. Clé d'API, pagination, codes d'erreur métier, documentation interactive | fournie — non modifiable |
 | Agent ADK | agent opérationnel sous `adk web`, configuration et clients d'accès prêts à l'emploi | fourni — à compléter |
 | Serveur MCP | squelette destiné à héberger les tools de l'exercice 4 | fourni — à compléter |
-| Tests | 23 tests répartis par exercice, exécutés sans appel au modèle | fournis |
 | Documentation | `docs/API.md` : routes et erreurs · `docs/SCHEMA.md` : schéma et requêtes types | fournie |
 
 ## Ce qui est à produire
@@ -60,7 +59,7 @@ Six tools, une instruction d'agent et un serveur MCP, répartis sur cinq fichier
 
 ---
 
-## 1. Mise en route
+## Mise en route
 
 ```bash
 cp .env.example .env          # renseigner GOOGLE_API_KEY
@@ -127,43 +126,18 @@ Seuls deux emplacements sont à modifier :
 L'édition se fait dans l'IDE local. Les fichiers sont montés dans le conteneur,
 qui prend en compte les modifications sans redémarrage.
 
-### Validation
+### Vérifier son travail
 
-| Commande | Portée |
+La vérification se fait en conversant avec l'agent dans `adk web`. Chaque
+exercice se termine par une question à lui poser et le comportement attendu en
+réponse.
+
+Deux commandes utiles pendant la mise au point :
+
+| Commande | Usage |
 |---|---|
-| `make check1` … `make check4` | tests d'un exercice |
-| `make check` | l'ensemble des tests |
-| `make reset` | remise à zéro de la base |
-
-Ces tests appellent directement les fonctions écrites, sans passer par le LLM.
-Ils sont donc déterministes : un test en échec signale un défaut réel du
-connecteur, jamais une variation du modèle.
-
----
-
-## 2. Conventions d'écriture des tools
-
-Six règles, applicables à tous les tools du TP. Elles font l'objet des tests.
-
-1. **Le nom et la docstring constituent la spécification lue par le modèle.**
-   Ce ne sont pas des commentaires : c'est le seul élément sur lequel le LLM
-   s'appuie pour décider d'appeler un tool, et avec quels arguments. Une
-   docstring imprécise produit un agent qui appelle le mauvais tool.
-2. **Annotations de type obligatoires**, et limitées aux types simples :
-   `str`, `int`, `float`, `bool`.
-3. **Retour sous forme de `dict` comportant une clé `status`**
-   (`"success"` ou `"error"`).
-4. **Erreur métier ≠ erreur technique.** Un produit inconnu ou une rupture de
-   stock sont des réponses normales de la boutique : elles se renvoient en
-   valeur de retour, pour que l'agent puisse les expliquer. Une API injoignable
-   est une panne : laisser l'exception remonter, ADK dispose d'un mécanisme de
-   reprise. **Proscrire tout `except Exception:` générique** — en ADK 2.x, il
-   masque la panne au framework et désactive cette reprise automatique.
-5. **Borner le volume renvoyé.** Le catalogue compte 180 produits ; les
-   transmettre intégralement sature la fenêtre de contexte et dégrade les
-   réponses.
-6. **Convertir les valeurs pour un lecteur humain.** L'API exprime les prix en
-   centimes.
+| `make logs` | affiche les appels de tools et les erreurs Python en direct |
+| `make reset` | remet la base à zéro, notamment le stock réservé par les essais |
 
 ---
 
@@ -212,7 +186,13 @@ question de l'exercice 0 et comparer.
 - Renvoyer les descriptions complètes de 20 produits permet de mesurer l'effet
   d'une réponse trop volumineuse sur la qualité des réponses.
 
-### Validation — `make check1`
+### Vérification
+
+Dans `adk web` : « quels casques proposez-vous à moins de 100 € ? »
+
+L'agent doit citer des références réelles du catalogue avec leur prix en euros.
+Puis : « combien de produits compte le catalogue ? » — la réponse attendue est
+180, et non 20.
 
 ---
 
@@ -252,7 +232,13 @@ point les requêtes avant de les coder. Le schéma est également décrit dans
 lecture seule — le moindre privilège est ici la configuration par défaut, non
 une précaution ajoutée après coup.
 
-### Validation — `make check2`
+### Vérification
+
+Dans `adk web` : « le AUD-0174 est-il disponible ? », puis « quels sont les
+produits audio les mieux notés ? »
+
+L'agent doit annoncer un stock réparti par entrepôt, et un classement assorti
+des notes moyennes et du nombre d'avis.
 
 ---
 
@@ -289,7 +275,18 @@ explicitement : ce qui n'est pas écrit ne sera pas appliqué.
 
 Client de test : `alice@example.com`.
 
-### Validation — `make check3`
+### Vérification
+
+Dans `adk web`, enchaîner :
+
+1. « quelles sont les dernières commandes de alice@example.com ? » ;
+2. « commande-lui un AUD-0174 » — l'agent doit vérifier le stock, récapituler et
+   **attendre une confirmation** avant d'agir ;
+3. « en fait, j'en veux 100 » — l'agent doit annoncer le stock réellement
+   disponible et proposer une quantité réduite, sans message d'erreur technique.
+
+L'étape 2 est le critère déterminant : un agent qui commande sans confirmation
+signale une instruction insuffisante.
 
 ---
 
@@ -313,13 +310,17 @@ l'agent d'un tiers écrit dans un autre framework. C'est la différence entre
 3. Déclarer un `McpToolset` dans `tools_mcp.py`, puis le substituer aux deux
    function tools dans `agent.py`.
 
-Le comportement de l'agent doit rester strictement identique : le test de
-l'exercice vérifie que les deux chemins renvoient les mêmes données.
+Le comportement de l'agent doit rester strictement identique : seul le mode
+d'accès aux données change, pas les données elles-mêmes.
 
 > Les chemins d'import indiqués par la documentation officielle ne correspondent
 > pas à la version installée. Les chemins valides figurent dans `tools_mcp.py`.
 
-### Validation — `make check4`
+### Vérification
+
+Reposer les deux questions de l'exercice 2. Les réponses doivent être
+identiques : seul le chemin d'accès a changé. `make logs` confirme que les
+appels transitent désormais par le serveur MCP.
 
 ---
 
@@ -332,7 +333,7 @@ l'exercice vérifie que les deux chemins renvoient les mêmes données.
 | L'agent n'appelle jamais un tool | La docstring n'indique pas *quand* l'utiliser. Relire celle de `search_products`. |
 | `401 unauthorized` | Passer par `shop_api()`, qui transmet la clé d'API. |
 | L'agent disparaît de l'interface | Erreur de syntaxe dans un fichier. Consulter `make logs`. |
-| Tests de stock incohérents | Des essais de commande ont réservé du stock. Lancer `make reset`. |
+| Stock qui diminue sans raison | Les essais de commande réservent du stock. Lancer `make reset`. |
 | Client SQL connecté mais aucune table | Champ *Database* laissé à `postgres` : la connexion réussit sur une base vide. Saisir `shop`. |
 | Client SQL : connexion refusée | Port `8081` (Adminer) au lieu de `5432`, ou hôte `db` au lieu de `localhost`. |
 | Adminer refuse la connexion | Menu *Système* resté sur MySQL : sélectionner PostgreSQL. Le serveur est `db`, pas `localhost`. |
