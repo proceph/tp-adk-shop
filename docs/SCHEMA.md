@@ -1,7 +1,19 @@
 # Base de données — aide-mémoire
 
-Connexion depuis tes tools : rôle `student`, **lecture seule** (`SELECT` uniquement).
-Adminer : http://localhost:8081 — serveur `db`, utilisateur `student`, mot de passe `student`, base `shop`.
+Les tools se connectent avec le rôle `student` : **lecture seule** (`SELECT` uniquement).
+Deux façons d'accéder à la base :
+
+| Outil | Paramètres |
+|---|---|
+| **Adminer** (aucune installation) — http://localhost:8081 | serveur `db` · utilisateur `student` · mot de passe `student` · base `shop` |
+| **Client SQL externe** (DBeaver, DataGrip, psql) | hôte `localhost` · port **`5432`** · base `shop` · utilisateur `student` · mot de passe `student` |
+
+`8081` est le port de l'interface web d'Adminer, pas celui de PostgreSQL.
+Le serveur PostgreSQL écoute sur `5432`.
+
+Le nom d'hôte `db` n'est valable qu'à l'intérieur du réseau Docker — c'est celui
+qu'utilisent les tools, et celui à saisir dans Adminer, qui tourne lui aussi dans
+un conteneur. Depuis un client installé sur le poste, l'hôte est `localhost`.
 
 ## Tables
 
