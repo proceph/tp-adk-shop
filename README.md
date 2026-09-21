@@ -36,20 +36,26 @@ installation de Python, de PostgreSQL ou de dépendance n'est requise.
 | Base PostgreSQL | 180 produits · 8 catégories · 60 clients · 300 commandes · 700 avis · stocks répartis sur 3 entrepôts | fournie — accès en lecture seule |
 | API REST | 8 routes : catalogue, clients, commandes. Clé d'API, pagination, codes d'erreur métier, documentation interactive | fournie — non modifiable |
 | Agent ADK | agent opérationnel sous `adk web`, configuration et clients d'accès prêts à l'emploi | fourni — à compléter |
-| Serveur MCP | squelette destiné à héberger les tools de l'exercice 4 | fourni — à compléter |
+| **3 tools d'exemple** | un par mode d'accès : API REST, base SQL, serveur MCP. Complets et fonctionnels dès le démarrage | fournis — à imiter |
+| Serveur MCP | serveur opérationnel publiant le tool d'exemple | fourni — à compléter |
 | Documentation | `docs/API.md` : routes et erreurs · `docs/SCHEMA.md` : schéma et requêtes types | fournie |
 
 ## Ce qui est à produire
 
-Six tools, une instruction d'agent et un serveur MCP, répartis sur cinq fichiers :
+Chaque mode d'accès est illustré par un **tool d'exemple complet et
+fonctionnel**. Le travail consiste à écrire les tools manquants sur ce modèle,
+puis à les activer dans `agent.py` en décommentant la ligne correspondante.
 
-| Fichier | Contenu attendu | Exercice |
-|---|---|---|
-| `agent/shop_agent/tools_api.py` | 4 tools interrogeant l'API REST | 1 et 3 |
-| `agent/shop_agent/tools_db.py` | 2 tools interrogeant la base en SQL | 2 |
-| `agent/shop_agent/agent.py` | déclaration des tools et instruction de l'agent | 1 et 3 |
-| `mcp_server/server.py` | publication des tools en MCP | 4 (bonus) |
-| `agent/shop_agent/tools_mcp.py` | branchement du serveur MCP sur l'agent | 4 (bonus) |
+| Fichier | Exemple fourni | À écrire | Exercice |
+|---|---|---|---|
+| `agent/shop_agent/tools_api.py` | `search_products` | `get_product` | 1 |
+| `agent/shop_agent/tools_db.py` | `check_stock` | `top_rated_products` | 2 |
+| `agent/shop_agent/tools_api.py` | — | `get_customer_orders`, `create_order` | 3 |
+| `agent/shop_agent/agent.py` | 2 tools déjà branchés | l'instruction de l'agent | 3 |
+| `mcp_server/server.py` | `check_stock` | `top_rated_products` | 4 (bonus) |
+| `agent/shop_agent/tools_mcp.py` | branchement complet | rien | 4 (bonus) |
+
+Soit quatre tools, une instruction et un tool MCP.
 
 ## Prérequis
 
@@ -164,27 +170,36 @@ Explorer ensuite les deux briques à connecter :
 
 **Durée : 35 min · fichier `agent/shop_agent/tools_api.py`**
 
-### À implémenter
+### Exemple fourni — à lire d'abord
 
 ```python
 def search_products(query: str = "", category: str = "", max_price_eur: float = 0.0) -> dict
+```
+
+Ce tool est **complet, fonctionnel et déjà branché** : reposer la question de
+l'exercice 0 dans `adk web` suffit à voir la différence avec l'agent aveugle.
+
+Le lire intégralement avant d'écrire quoi que ce soit. Il condense tout ce que
+le TP demande : une docstring qui précise *quand* appeler le tool, la conversion
+euros → centimes attendue par l'API, `total_matching` renvoyé pour signaler une
+liste tronquée, et `raise_for_status()` qui laisse ADK réessayer sur panne.
+
+### À implémenter
+
+```python
 def get_product(sku: str) -> dict
 ```
 
-La docstring de `search_products` est fournie intégralement : elle sert de
-modèle de référence et doit être lue avant de rédiger celle de `get_product`.
-Seuls les corps sont à écrire.
-
-Brancher ensuite les deux tools dans `agent.py` (`tools=[...]`), puis reposer la
-question de l'exercice 0 et comparer.
+La docstring est à rédiger, sur le modèle de `search_products`. Puis décommenter
+`get_product` dans la liste `tools=[...]` de `agent.py`.
 
 ### Points d'attention
 
-- `GET /products` renvoie `items` **et** `total`. Ignorer `total` conduit l'agent
-  à affirmer que le catalogue compte 20 produits ; il en compte 180.
-- Le filtre de l'API porte sur `max_price_cents`, le tool reçoit des euros.
-- Renvoyer les descriptions complètes de 20 produits permet de mesurer l'effet
-  d'une réponse trop volumineuse sur la qualité des réponses.
+- Un SKU inconnu renvoie un **404**. C'est une réponse normale de la boutique :
+  elle se traite en valeur de retour, pas en exception.
+- La fiche détaillée inclut la description, que l'exemple tronque à
+  `DESCRIPTION_MAX` caractères. Renvoyer des descriptions complètes permet de
+  mesurer l'effet d'une réponse trop volumineuse sur la qualité de l'agent.
 
 ### Vérification
 
@@ -207,25 +222,38 @@ L'information existe pourtant, dans la table `product_reviews`. Deux options :
 attendre une évolution de l'API, ou lire la base. Un connecteur combine
 généralement les deux approches.
 
-### À implémenter
+### Exemple fourni — à lire d'abord
 
 ```python
 def check_stock(sku: str) -> dict
+```
+
+Complet, fonctionnel et déjà branché. Il montre le patron d'un tool SQL :
+paramètres passés par le second argument d'`execute()` et jamais par
+concaténation, SKU inconnu traité en erreur métier, résultat agrégé et borné.
+
+Il contient aussi un piège du schéma qui mérite attention : `quantity_available`
+compte les articles **déjà réservés** par d'autres commandes. Le stock réellement
+vendable vaut `quantity_available - quantity_reserved`.
+
+### À implémenter
+
+```python
 def top_rated_products(category: str = "", limit: int = 5) -> dict
 ```
 
+Puis décommenter `top_rated_products` dans `agent.py`.
+
 Adminer (http://localhost:8081) permet d'explorer le schéma et de mettre au
-point les requêtes avant de les coder. Le schéma est également décrit dans
+point la requête avant de la coder. Le schéma est également décrit dans
 `docs/SCHEMA.md`.
 
 ### Points d'attention
 
-- `quantity_available` inclut les articles **déjà réservés** par d'autres
-  commandes. Le stock réellement vendable vaut `available - reserved`.
 - Un produit noté 5/5 par un seul client n'est pas « le mieux noté » :
   filtrer sur un nombre minimal d'avis (`HAVING count(...) >= 3`).
-- Les paramètres SQL se passent toujours par le second argument de `execute()`,
-  jamais par concaténation.
+- Renvoyer le nombre d'avis en plus de la note : une moyenne sans son effectif
+  n'a pas de sens, et l'agent doit pouvoir le mentionner.
 
 À titre d'illustration, tenter un `DELETE` depuis Adminer avec le compte
 `student` : la base refuse. Le rôle utilisé par les tools est restreint à la
@@ -302,19 +330,28 @@ consommable par tout client compatible : un agent ADK, un IDE, Claude Code, ou
 l'agent d'un tiers écrit dans un autre framework. C'est la différence entre
 écrire une fonction et publier une API.
 
-### Marche à suivre
+### Exemple fourni
 
-1. Reprendre `check_stock` et `top_rated_products` dans `mcp_server/server.py`,
-   décorés par `@mcp.tool()`.
+`mcp_server/server.py` publie déjà `check_stock` : le même code métier que dans
+`tools_db.py`, décoré par `@mcp.tool()`. Seul l'emballage change — FastMCP lit
+la signature et la docstring pour construire le schéma MCP.
+
+`agent/shop_agent/tools_mcp.py` est fourni complet : le `McpToolset` y est
+déclaré, rien n'est à y écrire.
+
+> Les chemins d'import de ce fichier ne sont **pas** ceux de la documentation
+> officielle, en retard d'une version. Les utiliser tels quels.
+
+### À implémenter
+
+1. Ajouter `top_rated_products` dans `mcp_server/server.py`, sur le modèle de
+   `check_stock`. Le corps peut être repris tel quel depuis `tools_db.py`.
 2. Démarrer le serveur : `make mcp`.
-3. Déclarer un `McpToolset` dans `tools_mcp.py`, puis le substituer aux deux
-   function tools dans `agent.py`.
+3. Décommenter le bloc MCP en fin d'`agent.py` : il remplace les deux tools
+   d'accès direct à la base par leurs équivalents servis en MCP.
 
 Le comportement de l'agent doit rester strictement identique : seul le mode
 d'accès aux données change, pas les données elles-mêmes.
-
-> Les chemins d'import indiqués par la documentation officielle ne correspondent
-> pas à la version installée. Les chemins valides figurent dans `tools_mcp.py`.
 
 ### Vérification
 
@@ -351,15 +388,27 @@ appels transitent désormais par le serveur MCP.
 
 ## Pour aller plus loin
 
-Ce TP s'arrête au développement local : l'agent, l'API et la base tournent dans
-Docker, sur un poste. Les deux ressources suivantes, publiées par Google sur
-[Google Skills](https://www.skills.google/), prolongent directement les
-exercices 3 et 4 en abordant le déploiement.
+Ce TP s'arrête au développement local, sur des sources de données structurées :
+l'agent, l'API et la base tournent dans Docker, sur un poste. Les trois
+ressources suivantes, publiées par Google, en prolongent chacune une limite —
+les données non structurées, l'hébergement du serveur MCP, la mise en production.
 
 | Ressource | Prolonge | Durée |
 |---|---|---|
+| [Building Agents with Retrieval-Augmented Generation](https://codelabs.developers.google.com/codelabs/production-ready-ai-with-gc/7-advanced-agent-capabilities/building-agents-with-retrieval-augmented-generation) | tout le TP | codelab |
 | [Build an AI Agent and Configure an MCP Server on Cloud Run](https://www.skills.google/focuses/132621) | exercice 4 | ~1 h 30 |
 | [Deploy Your First Agent](https://www.skills.google/paths/3802/course_templates/1639) | exercices 3 et 4 | ~1 h 15 |
+
+**Building Agents with Retrieval-Augmented Generation** — codelab, extrait du
+parcours *Production-Ready AI with Google Cloud*. C'est le prolongement le plus
+direct de ce TP : il construit un agent ADK multi-tools qui croise des données
+**structurées**, via des tools sur mesure comme ceux écrits ici, et des données
+**non structurées**, via une recherche sémantique sur Vertex AI Search.
+
+Le TP s'arrête aux sources structurées — une API et une base. Le codelab ajoute
+la dimension manquante : documents, recherche vectorielle, et la question de
+l'ancrage des réponses dans des sources externes plutôt que dans les
+connaissances figées du modèle. Il utilise `LlmAgent`, la même classe qu'ici.
 
 **Build an AI Agent and Configure an MCP Server on Cloud Run** — atelier pratique.
 Construction d'un agent guide touristique pour un zoo fictif, interrogeant un
@@ -373,5 +422,6 @@ et sur Cloud Run, et introduction à Memory Bank pour la mémoire persistante
 entre sessions. Cette dernière notion répond à une limite visible dès
 l'exercice 3 : l'agent du TP ne conserve rien d'une conversation à l'autre.
 
-Ces deux ressources nécessitent un compte Google Skills. Les ateliers pratiques
-s'exécutent sur une infrastructure Google Cloud provisionnée pour la session.
+Le codelab est en accès libre. Les deux ateliers Google Skills nécessitent un
+compte, et s'exécutent sur une infrastructure Google Cloud provisionnée pour la
+session.
