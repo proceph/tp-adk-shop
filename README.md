@@ -80,8 +80,18 @@ make up                       # démarrage de la boutique
 
 `make logs` affiche l'activité de l'agent en direct.
 
-Adminer ne demande aucune installation : serveur `db`, utilisateur `student`,
-mot de passe `student`, base `shop`.
+Adminer ne demande aucune installation. Les quatre champs du formulaire :
+
+| Champ Adminer | Valeur |
+|---|---|
+| Système | **PostgreSQL** — le menu propose MySQL par défaut |
+| Serveur | `db` |
+| Utilisateur / Mot de passe | `student` / `student` |
+| Base de données | `shop` |
+
+Adminer s'exécutant lui-même dans un conteneur, le serveur est `db`, nom du
+service dans le réseau Docker. `localhost` y désignerait le conteneur Adminer
+et serait refusé.
 
 Pour un client SQL externe (DBeaver, DataGrip, psql), le serveur PostgreSQL
 lui-même est exposé sur un **autre port** :
@@ -93,9 +103,13 @@ lui-même est exposé sur un **autre port** :
 | Base | `shop` |
 | Utilisateur / mot de passe | `student` / `student` (lecture seule) |
 
-Deux confusions fréquentes : `8081` est l'interface web d'Adminer, pas le port
-de PostgreSQL ; et `db` est le nom du serveur **à l'intérieur** du réseau Docker
-— depuis un client installé sur le poste, l'hôte est `localhost`.
+Trois confusions fréquentes :
+
+- `8081` est le port de l'interface web d'Adminer, pas celui de PostgreSQL ;
+- le nom du serveur dépend du point de départ : `db` depuis Adminer, qui tourne
+  dans un conteneur, mais `localhost` depuis un client installé sur le poste ;
+- Adminer propose **MySQL** par défaut dans le menu *Système* : sélectionner
+  PostgreSQL, sinon la connexion échoue quels que soient les autres champs.
 
 > **Avertissement — adressage réseau.** Depuis un navigateur, l'API répond sur
 > `localhost:8080`. Depuis le conteneur de l'agent, elle répond sur `api:8000`.
@@ -321,6 +335,7 @@ l'exercice vérifie que les deux chemins renvoient les mêmes données.
 | Tests de stock incohérents | Des essais de commande ont réservé du stock. Lancer `make reset`. |
 | Client SQL connecté mais aucune table | Champ *Database* laissé à `postgres` : la connexion réussit sur une base vide. Saisir `shop`. |
 | Client SQL : connexion refusée | Port `8081` (Adminer) au lieu de `5432`, ou hôte `db` au lieu de `localhost`. |
+| Adminer refuse la connexion | Menu *Système* resté sur MySQL : sélectionner PostgreSQL. Le serveur est `db`, pas `localhost`. |
 | Blocage général | `make reset` réinitialise la boutique. |
 
 ## Annexe — Documentation fournie

@@ -5,11 +5,14 @@ Deux façons d'accéder à la base :
 
 | Outil | Paramètres |
 |---|---|
-| **Adminer** (aucune installation) — http://localhost:8081 | serveur `db` · utilisateur `student` · mot de passe `student` · base `shop` |
+| **Adminer** (aucune installation) — http://localhost:8081 | système **PostgreSQL** · serveur `db` · utilisateur `student` · mot de passe `student` · base `shop` |
 | **Client SQL externe** (DBeaver, DataGrip, psql) | hôte `localhost` · port **`5432`** · base `shop` · utilisateur `student` · mot de passe `student` |
 
 `8081` est le port de l'interface web d'Adminer, pas celui de PostgreSQL.
 Le serveur PostgreSQL écoute sur `5432`.
+
+Dans Adminer, le menu *Système* propose **MySQL** par défaut : sélectionner
+PostgreSQL, faute de quoi la connexion échoue quels que soient les autres champs.
 
 Le nom d'hôte `db` n'est valable qu'à l'intérieur du réseau Docker — c'est celui
 qu'utilisent les tools, et celui à saisir dans Adminer, qui tourne lui aussi dans
