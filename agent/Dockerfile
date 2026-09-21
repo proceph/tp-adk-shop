@@ -9,4 +9,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 # tu édites dans ton IDE, le conteneur voit tes changements immédiatement.
 
 EXPOSE 8000
-CMD ["adk", "web", "--host", "0.0.0.0", "--port", "8000", "/app"]
+CMD ["adk", "web", "--host", "0.0.0.0", "--port", "8000", "--reload_agents", "/app"]

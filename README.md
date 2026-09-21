@@ -36,22 +36,24 @@ installation de Python, de PostgreSQL ou de dépendance n'est requise.
 | Base PostgreSQL | 180 produits · 8 catégories · 60 clients · 300 commandes · 700 avis · stocks répartis sur 3 entrepôts | fournie — accès en lecture seule |
 | API REST | 8 routes : catalogue, clients, commandes. Clé d'API, pagination, codes d'erreur métier, documentation interactive | fournie — non modifiable |
 | Agent ADK | agent opérationnel sous `adk web`, configuration et clients d'accès prêts à l'emploi | fourni — à compléter |
-| **3 tools d'exemple** | un par mode d'accès : API REST, base SQL, serveur MCP. Complets et fonctionnels dès le démarrage | fournis — à imiter |
+| **3 tools d'exemple** | un par mode d'accès : API REST, base SQL, serveur MCP. Écrits et fonctionnels, mais **désactivés** : les activer est le premier geste du TP | fournis — à activer puis à imiter |
 | Serveur MCP | serveur opérationnel publiant le tool d'exemple | fourni — à compléter |
 | Documentation | `docs/API.md` : routes et erreurs · `docs/SCHEMA.md` : schéma et requêtes types | fournie |
 
 ## Ce qui est à produire
 
-Chaque mode d'accès est illustré par un **tool d'exemple complet et
-fonctionnel**. Le travail consiste à écrire les tools manquants sur ce modèle,
-puis à les activer dans `agent.py` en décommentant la ligne correspondante.
+L'agent démarre **sans aucun tool actif** : toutes les lignes de `tools=[...]`
+sont commentées. Chaque mode d'accès est illustré par un tool d'exemple déjà
+écrit, qu'il suffit de décommenter pour voir l'agent changer de comportement.
+Le travail consiste ensuite à écrire les tools manquants sur ce modèle, puis à
+les activer de la même façon.
 
 | Fichier | Exemple fourni | À écrire | Exercice |
 |---|---|---|---|
 | `agent/shop_agent/tools_api.py` | `search_products` | `get_product` | 1 |
 | `agent/shop_agent/tools_db.py` | `check_stock` | `top_rated_products` | 2 |
 | `agent/shop_agent/tools_api.py` | — | `get_customer_orders`, `create_order` | 3 |
-| `agent/shop_agent/agent.py` | 2 tools déjà branchés | l'instruction de l'agent | 3 |
+| `agent/shop_agent/agent.py` | liste de tools à décommenter | l'instruction de l'agent | 3 |
 | `mcp_server/server.py` | `check_stock` | `top_rated_products` | 4 (bonus) |
 | `agent/shop_agent/tools_mcp.py` | branchement complet | rien | 4 (bonus) |
 
@@ -129,8 +131,14 @@ Seuls deux emplacements sont à modifier :
 - `agent/shop_agent/` — les tools et l'agent (exercices 1 à 3) ;
 - `mcp_server/server.py` — le serveur MCP (exercice 4).
 
-L'édition se fait dans l'IDE local. Les fichiers sont montés dans le conteneur,
-qui prend en compte les modifications sans redémarrage.
+L'édition se fait dans l'IDE local ; les fichiers sont montés dans le conteneur.
+`adk web` est lancé en rechargement automatique et prend normalement en compte
+les modifications à la conversation suivante. En cas de doute — un changement
+qui ne produit aucun effet — `make restart` lève l'ambiguïté en quelques
+secondes.
+
+Le serveur MCP de l'exercice 4 fait exception : il ne recharge jamais son
+fichier, et exige `make mcp` après chaque modification.
 
 ### Vérifier son travail
 
@@ -138,28 +146,44 @@ La vérification se fait en conversant avec l'agent dans `adk web`. Chaque
 exercice se termine par une question à lui poser et le comportement attendu en
 réponse.
 
-Deux commandes utiles pendant la mise au point :
+Trois commandes utiles pendant la mise au point :
 
 | Commande | Usage |
 |---|---|
 | `make logs` | affiche les appels de tools et les erreurs Python en direct |
+| `make restart` | recharge l'agent si une modification semble ignorée |
 | `make reset` | remet la base à zéro, notamment le stock réservé par les essais |
+
+Un réflexe à prendre : garder `make logs` ouvert dans un second terminal. C'est
+là qu'apparaissent les tools réellement appelés par le modèle, leurs arguments,
+et les erreurs Python qui, sinon, se traduisent par un laconique « une erreur
+est survenue » dans la conversation.
 
 ---
 
-## Exercice 0 — Constater les limites du modèle seul
+## Exercice 0 — L'agent sans aucun tool
 
-**Durée : 25 min · aucun code**
+**Durée : 25 min · aucun code à écrire**
+
+Au démarrage du TP, la liste `tools` de `agent.py` est **vide** : toutes les
+lignes y sont commentées. L'agent est un modèle de langage sans le moindre
+accès au système.
 
 Ouvrir http://localhost:8000, sélectionner `shop_agent` et poser la question :
 
 > « Combien coûte le casque Orion Air ? »
 
-Observer précisément la réponse. L'agent ne dispose d'aucun tool
-(`tools=[]` dans `agent.py`) ni d'aucun accès au catalogue : il refuse ou il
-invente. Cette réponse constitue le point de référence du TP.
+Observer précisément la réponse, et la **noter** : elle sert de point de
+référence pour tout le reste du TP. Deux comportements sont possibles, l'un et
+l'autre instructifs — le modèle refuse de répondre, ou il invente une référence
+et un prix parfaitement vraisemblables. Insister avec « es-tu sûr ? » permet de
+mesurer la solidité de la réponse.
 
-Explorer ensuite les deux briques à connecter :
+Poser ensuite quelques questions supplémentaires : « quels casques avez-vous en
+stock ? », « quelle est ma dernière commande ? ». Aucune ne peut trouver de
+réponse fondée, et c'est précisément le problème que le connecteur résout.
+
+Explorer enfin les deux briques à connecter :
 
 - l'API sur http://localhost:8080/docs — essayer `GET /products`, clé `tp-adk-2026` ;
 - la base via Adminer sur http://localhost:8081.
@@ -170,28 +194,48 @@ Explorer ensuite les deux briques à connecter :
 
 **Durée : 35 min · fichier `agent/shop_agent/tools_api.py`**
 
-### Exemple fourni — à lire d'abord
+### Étape 1 — activer un tool déjà écrit
+
+`search_products` est **déjà implémenté et fonctionnel** dans `tools_api.py`.
+Il n'y a rien à coder : il s'agit seulement de le brancher.
+
+Dans `agent.py`, décommenter cette unique ligne de `tools=[...]` :
+
+```python
+        search_products,
+```
+
+Puis reposer à l'agent **exactement la même question** qu'à l'exercice 0, dans
+une nouvelle conversation. Comparer avec la réponse notée précédemment.
+
+C'est le point de bascule du TP : une ligne décommentée sépare un modèle qui
+invente d'un agent qui consulte un système réel. Observer aussi *comment* le
+modèle s'en sert — demander « et en moins cher ? » montre qu'il rappelle le tool
+avec d'autres arguments, sans qu'on le lui ait demandé.
+
+> Si le changement ne semble pas pris en compte, lancer `make restart`, puis
+> ouvrir une nouvelle conversation.
+
+### Étape 2 — lire l'exemple
 
 ```python
 def search_products(query: str = "", category: str = "", max_price_eur: float = 0.0) -> dict
 ```
 
-Ce tool est **complet, fonctionnel et déjà branché** : reposer la question de
-l'exercice 0 dans `adk web` suffit à voir la différence avec l'agent aveugle.
+Maintenant que son effet est visible, lire ce tool intégralement. Il condense
+tout ce que le TP demande : une docstring qui précise *quand* l'appeler, la
+conversion euros → centimes attendue par l'API, `total_matching` renvoyé pour
+signaler une liste tronquée, et `raise_for_status()` qui laisse ADK réessayer
+en cas de panne.
 
-Le lire intégralement avant d'écrire quoi que ce soit. Il condense tout ce que
-le TP demande : une docstring qui précise *quand* appeler le tool, la conversion
-euros → centimes attendue par l'API, `total_matching` renvoyé pour signaler une
-liste tronquée, et `raise_for_status()` qui laisse ADK réessayer sur panne.
-
-### À implémenter
+### Étape 3 — à implémenter
 
 ```python
 def get_product(sku: str) -> dict
 ```
 
-La docstring est à rédiger, sur le modèle de `search_products`. Puis décommenter
-`get_product` dans la liste `tools=[...]` de `agent.py`.
+La docstring est à rédiger, sur le modèle de `search_products`. Puis
+décommenter `get_product` dans `tools=[...]`, et vérifier en conversant.
 
 ### Points d'attention
 
@@ -222,13 +266,16 @@ L'information existe pourtant, dans la table `product_reviews`. Deux options :
 attendre une évolution de l'API, ou lire la base. Un connecteur combine
 généralement les deux approches.
 
-### Exemple fourni — à lire d'abord
+### Étape 1 — activer l'exemple, puis le lire
 
 ```python
 def check_stock(sku: str) -> dict
 ```
 
-Complet, fonctionnel et déjà branché. Il montre le patron d'un tool SQL :
+Déjà écrit et fonctionnel : décommenter `check_stock` dans `tools=[...]`, puis
+demander à l'agent « le AUD-0174 est-il disponible ? ».
+
+Il montre le patron d'un tool SQL :
 paramètres passés par le second argument d'`execute()` et jamais par
 concaténation, SKU inconnu traité en erreur métier, résultat agrégé et borné.
 
@@ -236,13 +283,13 @@ Il contient aussi un piège du schéma qui mérite attention : `quantity_availab
 compte les articles **déjà réservés** par d'autres commandes. Le stock réellement
 vendable vaut `quantity_available - quantity_reserved`.
 
-### À implémenter
+### Étape 2 — à implémenter
 
 ```python
 def top_rated_products(category: str = "", limit: int = 5) -> dict
 ```
 
-Puis décommenter `top_rated_products` dans `agent.py`.
+Puis décommenter `top_rated_products` dans `tools=[...]`.
 
 Adminer (http://localhost:8081) permet d'explorer le schéma et de mettre au
 point la requête avant de la coder. Le schéma est également décrit dans
