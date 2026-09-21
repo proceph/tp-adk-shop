@@ -24,8 +24,8 @@ def test_search_products_filtre_sur_le_prix_en_euros(api_joignable):
 
     assert result["products"], "Il existe des casques à moins de 100 €."
     assert all(p["price_eur"] <= 100 for p in result["products"]), (
-        "max_price_eur est en EUROS, mais l'API attend des CENTIMES. "
-        "As-tu pensé à convertir ?"
+        "max_price_eur est en EUROS, mais l'API attend des CENTIMES : "
+        "la conversion manque."
     )
 
 
@@ -35,7 +35,7 @@ def test_search_products_annonce_le_total(api_joignable):
     result = search_products()
 
     assert result["total_matching"] == NB_PRODUITS_TOTAL, (
-        f"Le catalogue contient {NB_PRODUITS_TOTAL} produits. Ton tool doit renvoyer ce total "
+        f"Le catalogue contient {NB_PRODUITS_TOTAL} produits. Le tool doit renvoyer ce total "
         "(champ `total` de l'API), sinon l'agent croira qu'il n'y en a que 20."
     )
     assert result["count"] <= result["total_matching"]

@@ -16,7 +16,7 @@ def _tools():
     except ImportError:
         pytest.fail(
             "shop_agent/tools_mcp.py ne définit pas encore `shop_mcp_toolset`.\n"
-            "Palier 4 : crée le McpToolset qui pointe vers ton serveur MCP."
+            "Exercice 4 : créer le McpToolset pointant vers le serveur MCP."
         )
 
     async def run():
@@ -37,7 +37,7 @@ def test_le_serveur_mcp_publie_les_deux_tools():
 
     assert {"check_stock", "top_rated_products"} <= noms, (
         f"Le serveur MCP ne publie que {sorted(noms)}. "
-        "As-tu bien décoré tes deux fonctions avec @mcp.tool() ?"
+        "Les deux fonctions sont-elles bien décorées avec @mcp.tool() ?"
     )
     asyncio.run(toolset.close())
 

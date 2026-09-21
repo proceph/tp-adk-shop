@@ -2,7 +2,7 @@
 
 C'est le système existant auquel l'agent doit se connecter. Elle se comporte
 comme une vraie API interne : clé d'API, pagination, prix en centimes, codes
-d'erreur métier. À toi d'écrire le connecteur qui va avec.
+d'erreur métier. Le travail consiste à écrire le connecteur qui va avec.
 
 Documentation interactive : http://localhost:8080/docs
 """

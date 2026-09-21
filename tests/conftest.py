@@ -1,10 +1,13 @@
-"""Configuration des tests — FOURNIE, ne pas modifier.
+"""Configuration des tests — BRANCHE SOLUTION UNIQUEMENT.
 
-Ces tests appellent directement TES fonctions, sans jamais passer par le LLM.
-Ils sont donc 100 % déterministes : un test rouge est un vrai bug dans ton
-connecteur, jamais un caprice du modèle.
+Ces tests ne font pas partie du TP : les élèves vérifient leur travail en
+conversant avec l'agent. Ils servent de filet de régression au corrigé,
+typiquement après une montée de version d'ADK.
 
-Lance-les avec `make check1`, `make check2`, … ou `make check` pour tout.
+Ils appellent directement les fonctions du corrigé, sans passer par le LLM, et
+sont donc entièrement déterministes.
+
+Exécution : `make check`, ou `make check1` … `make check4` par exercice.
 """
 
 import sys
@@ -26,8 +29,8 @@ NB_PRODUITS_TOTAL = 180
 def pytest_configure(config):
     for palier in (1, 2, 3, 4):
         config.addinivalue_line("markers", f"palier{palier}: tests du palier {palier}")
-    # ADK bavarde beaucoup sur ses features expérimentales. Ce n'est pas ton problème
-    # pendant le TP : on masque, pour que seules TES erreurs restent visibles.
+    # ADK émet de nombreux avertissements sur ses features expérimentales.
+    # On les masque, pour que seules les erreurs réelles restent visibles.
     for rule in (
         "ignore::DeprecationWarning",
         "ignore::UserWarning",

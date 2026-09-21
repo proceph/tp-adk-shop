@@ -1,7 +1,7 @@
-"""Configuration FOURNIE — tu n'as pas besoin de la modifier.
+"""Configuration FOURNIE — aucune modification n'est nécessaire.
 
-Elle lit les variables d'environnement injectées par docker-compose et expose
-deux helpers que tes tools utiliseront : `shop_api()` et `db_connection()`.
+Ce module lit les variables d'environnement injectées par docker-compose et
+expose deux helpers utilisés par les tools : `shop_api()` et `db_connection()`.
 """
 
 import os
@@ -11,8 +11,8 @@ import psycopg
 from psycopg.rows import dict_row
 
 # http://api:8000 depuis le conteneur agent.
-# Attention : depuis TON navigateur c'est http://localhost:8080. Ce n'est pas la
-# même adresse, et c'est l'erreur numéro un de ce TP.
+# Attention : depuis un navigateur, l'adresse est http://localhost:8080. Ce ne
+# sont pas les mêmes, et c'est l'erreur numéro un de ce TP.
 SHOP_API_URL = os.environ.get("SHOP_API_URL", "http://api:8000")
 SHOP_API_KEY = os.environ.get("SHOP_API_KEY", "tp-adk-2026")
 SHOP_DB_URL = os.environ.get("SHOP_DB_URL", "postgresql://student:student@db:5432/shop")
@@ -20,9 +20,9 @@ MCP_SERVER_URL = os.environ.get("MCP_SERVER_URL", "http://mcp:9000/mcp")
 
 
 def shop_api() -> httpx.Client:
-    """Client HTTP préconfiguré : bonne URL de base, clé d'API, timeout.
+    """Client HTTP préconfiguré : URL de base, clé d'API et timeout.
 
-    À utiliser comme ceci :
+    Usage :
 
         with shop_api() as client:
             response = client.get("/products", params={"q": "casque"})
@@ -37,7 +37,7 @@ def shop_api() -> httpx.Client:
 def db_connection() -> psycopg.Connection:
     """Connexion Postgres en LECTURE SEULE (rôle `student`).
 
-    Les lignes sont renvoyées sous forme de dictionnaires. À utiliser ainsi :
+    Les lignes sont renvoyées sous forme de dictionnaires. Usage :
 
         with db_connection() as conn:
             rows = conn.execute("SELECT ...", (param,)).fetchall()
