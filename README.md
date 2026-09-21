@@ -282,3 +282,32 @@ l'exercice vérifie que les deux chemins renvoient les mêmes données.
 | `docs/API.md` | routes, paramètres, codes d'erreur de l'API |
 | `docs/SCHEMA.md` | schéma de la base, pièges, requêtes types |
 | http://localhost:8080/docs | documentation interactive de l'API |
+
+---
+
+## Pour aller plus loin
+
+Ce TP s'arrête au développement local : l'agent, l'API et la base tournent dans
+Docker, sur un poste. Les deux ressources suivantes, publiées par Google sur
+[Google Skills](https://www.skills.google/), prolongent directement les
+exercices 3 et 4 en abordant le déploiement.
+
+| Ressource | Prolonge | Durée |
+|---|---|---|
+| [Build an AI Agent and Configure an MCP Server on Cloud Run](https://www.skills.google/focuses/132621) | exercice 4 | ~1 h 30 |
+| [Deploy Your First Agent](https://www.skills.google/paths/3802/course_templates/1639) | exercices 3 et 4 | ~1 h 15 |
+
+**Build an AI Agent and Configure an MCP Server on Cloud Run** — atelier pratique.
+Construction d'un agent guide touristique pour un zoo fictif, interrogeant un
+serveur MCP distant et Wikipédia, puis déploiement sur Cloud Run. Le schéma est
+celui de l'exercice 4 — un agent ADK consommant un serveur MCP — mais avec un
+serveur hébergé et non plus un conteneur local.
+
+**Deploy Your First Agent** — cours de niveau avancé. Passage d'un agent ADK du
+poste de développement à la production : déploiement sur Vertex AI Agent Engine
+et sur Cloud Run, et introduction à Memory Bank pour la mémoire persistante
+entre sessions. Cette dernière notion répond à une limite visible dès
+l'exercice 3 : l'agent du TP ne conserve rien d'une conversation à l'autre.
+
+Ces deux ressources nécessitent un compte Google Skills. Les ateliers pratiques
+s'exécutent sur une infrastructure Google Cloud provisionnée pour la session.
