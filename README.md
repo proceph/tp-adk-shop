@@ -76,9 +76,26 @@ make up                       # démarrage de la boutique
 |---|---|
 | http://localhost:8000 | Agent ADK — interface `adk web` |
 | http://localhost:8080/docs | API de la boutique — documentation interactive |
-| http://localhost:8081 | Base de données — Adminer (`db` / `student` / `student` / `shop`) |
+| http://localhost:8081 | Adminer — interface web d'accès à la base |
 
 `make logs` affiche l'activité de l'agent en direct.
+
+Adminer ne demande aucune installation : serveur `db`, utilisateur `student`,
+mot de passe `student`, base `shop`.
+
+Pour un client SQL externe (DBeaver, DataGrip, psql), le serveur PostgreSQL
+lui-même est exposé sur un **autre port** :
+
+| Paramètre | Valeur |
+|---|---|
+| Hôte | `localhost` |
+| Port | `5432` |
+| Base | `shop` |
+| Utilisateur / mot de passe | `student` / `student` (lecture seule) |
+
+Deux confusions fréquentes : `8081` est l'interface web d'Adminer, pas le port
+de PostgreSQL ; et `db` est le nom du serveur **à l'intérieur** du réseau Docker
+— depuis un client installé sur le poste, l'hôte est `localhost`.
 
 > **Avertissement — adressage réseau.** Depuis un navigateur, l'API répond sur
 > `localhost:8080`. Depuis le conteneur de l'agent, elle répond sur `api:8000`.
@@ -151,7 +168,7 @@ invente. Cette réponse constitue le point de référence du TP.
 Explorer ensuite les deux briques à connecter :
 
 - l'API sur http://localhost:8080/docs — essayer `GET /products`, clé `tp-adk-2026` ;
-- la base sur http://localhost:8081.
+- la base via Adminer sur http://localhost:8081.
 
 ---
 
@@ -302,6 +319,8 @@ l'exercice vérifie que les deux chemins renvoient les mêmes données.
 | `401 unauthorized` | Passer par `shop_api()`, qui transmet la clé d'API. |
 | L'agent disparaît de l'interface | Erreur de syntaxe dans un fichier. Consulter `make logs`. |
 | Tests de stock incohérents | Des essais de commande ont réservé du stock. Lancer `make reset`. |
+| Client SQL connecté mais aucune table | Champ *Database* laissé à `postgres` : la connexion réussit sur une base vide. Saisir `shop`. |
+| Client SQL : connexion refusée | Port `8081` (Adminer) au lieu de `5432`, ou hôte `db` au lieu de `localhost`. |
 | Blocage général | `make reset` réinitialise la boutique. |
 
 ## Annexe — Documentation fournie

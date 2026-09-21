@@ -1,10 +1,10 @@
 # API de la boutique — aide-mémoire
 
-Base : `http://api:8000` depuis le conteneur agent · `http://localhost:8080` depuis ton navigateur
+Base : `http://api:8000` depuis le conteneur agent · `http://localhost:8080` depuis un navigateur
 Documentation interactive : http://localhost:8080/docs
 
 Toutes les routes sauf `/health` exigent l'en-tête `X-API-Key: tp-adk-2026`.
-Le client fourni par `shop_api()` la pose déjà pour toi.
+Le client fourni par `shop_api()` la transmet automatiquement.
 
 ## Routes
 
@@ -58,7 +58,7 @@ Toutes les erreurs métier suivent la même forme :
            "details": {"sku": "AUD-0174", "requested": 99, "available": 38}}}
 ```
 
-Appuie-toi sur `code` (stable, fait pour les machines), pas sur `message`
+S'appuyer sur `code` (stable, destiné aux machines), et non sur `message`
 (humain, susceptible de changer).
 
 | Statut | `code` | Quand |
