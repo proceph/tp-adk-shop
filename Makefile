@@ -25,8 +25,11 @@ up: ## Démarre la boutique (db, api, adminer, agent)
 	@echo "  API (Swagger) ..... http://localhost:8080/docs"
 	@echo "  Base (Adminer) .... http://localhost:8081   serveur=db  user=student  pass=student  base=shop"
 
-mcp: ## Démarre en plus le serveur MCP (exercice 4)
-	@$(COMPOSE) --profile mcp up -d --build mcp
+mcp: ## Démarre (ou recharge) le serveur MCP — exercice 4
+	@# --force-recreate est indispensable : le serveur charge server.py au
+	@# démarrage et ne le relit pas. Sans cela, une modification du fichier
+	@# resterait invisible tant que le conteneur tourne.
+	@$(COMPOSE) --profile mcp up -d --build --force-recreate mcp
 	@echo "  Serveur MCP ....... http://localhost:9090/mcp"
 
 down: ## Arrête tout (la base est conservée)
