@@ -1,23 +1,54 @@
 # TP — Connecter un agent ADK à un système existant
 
-Une boutique en ligne est déjà en service : une base de données, une API REST, un
-catalogue, des clients, des commandes. Un agent ADK est fourni lui aussi, mais il
-est aveugle — il ne connaît rien de ce système.
+**Durée : 3 h 30 · 5 exercices · Python · Agent Development Kit (ADK) 2.9**
 
-L'objet du TP est d'écrire ce qui manque entre les deux : le **connecteur**.
+## But du TP
 
-Ni la base ni l'API ne doivent être modifiées. Comme en situation réelle, le
-système existant ne s'adapte pas à l'agent : c'est à l'agent de savoir lui parler.
+Un agent conversationnel ne connaît rien du système d'information de
+l'organisation qui le déploie. Le relier à ce système — catalogue, stocks,
+commandes — n'est pas un détail d'implémentation : c'est l'essentiel du travail,
+et c'est là que se jouent la fiabilité et la sûreté de l'agent.
 
-**Durée : 3 h 30 · 5 exercices · Langage : Python**
+Le TP reproduit cette situation. Une boutique en ligne est en service. Un agent
+ADK est fourni, mais aveugle : il ignore tout du catalogue. L'exercice consiste à
+écrire ce qui manque entre les deux, le **connecteur**, puis à observer ce que
+chaque décision de conception change dans le comportement de l'agent.
 
----
+Aucune modification de la base ni de l'API n'est autorisée. Comme en situation
+réelle, le système existant ne s'adapte pas à l'agent : c'est à l'agent de
+savoir lui parler.
 
-## Objectifs
+## Ce qui est mis à disposition
+
+L'environnement complet est fourni et démarre par une commande unique. Aucune
+installation de Python, de PostgreSQL ou de dépendance n'est requise.
+
+| Brique | Contenu | Statut |
+|---|---|---|
+| Base PostgreSQL | 180 produits · 8 catégories · 60 clients · 300 commandes · 700 avis · stocks répartis sur 3 entrepôts | fournie — accès en lecture seule |
+| API REST | 8 routes : catalogue, clients, commandes. Clé d'API, pagination, codes d'erreur métier, documentation interactive | fournie — non modifiable |
+| Agent ADK | agent opérationnel sous `adk web`, configuration et clients d'accès prêts à l'emploi | fourni — à compléter |
+| Serveur MCP | squelette destiné à héberger les tools de l'exercice 4 | fourni — à compléter |
+| Tests | 23 tests répartis par exercice, exécutés sans appel au modèle | fournis |
+| Documentation | `docs/API.md` : routes et erreurs · `docs/SCHEMA.md` : schéma et requêtes types | fournie |
+
+## Ce qui est à produire
+
+Six tools, une instruction d'agent et un serveur MCP, répartis sur cinq fichiers :
+
+| Fichier | Contenu attendu | Exercice |
+|---|---|---|
+| `agent/shop_agent/tools_api.py` | 4 tools interrogeant l'API REST | 1 et 3 |
+| `agent/shop_agent/tools_db.py` | 2 tools interrogeant la base en SQL | 2 |
+| `agent/shop_agent/agent.py` | déclaration des tools et instruction de l'agent | 1 et 3 |
+| `mcp_server/server.py` | publication des tools en MCP | 4 (bonus) |
+| `agent/shop_agent/tools_mcp.py` | branchement du serveur MCP sur l'agent | 4 (bonus) |
+
+## Compétences visées
 
 À l'issue du TP, être capable de :
 
-- exposer une API REST et une base de données à un LLM sous forme de *tools* ADK ;
+- exposer une API REST et une base de données à un LLM sous forme de tools ADK ;
 - rédiger une docstring de tool exploitable par un modèle ;
 - distinguer erreur métier et erreur technique, et traiter chacune correctement ;
 - encadrer un tool à effet de bord par une instruction d'agent ;
