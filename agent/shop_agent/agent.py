@@ -1,7 +1,7 @@
 """L'agent du shop — c'est ici que tout se branche.
 
-`adk web` cherche une variable nommée exactement `root_agent` dans ce fichier.
-Si tu la renommes, ton agent disparaît de l'interface.
+`adk web` recherche une variable nommée exactement `root_agent` dans ce fichier.
+La renommer fait disparaître l'agent de l'interface.
 """
 
 from google.adk.agents import LlmAgent
@@ -9,10 +9,10 @@ from google.adk.agents import LlmAgent
 from .tools_api import create_order, get_customer_orders, get_product, search_products
 from .tools_db import check_stock, top_rated_products
 
-# TODO PALIER 0 — lis cette instruction, puis reviens l'enrichir au palier 3.
+# TODO EXERCICE 0 — lire cette instruction, puis revenir l'enrichir à l'exercice 3.
 #
-# L'instruction est le « contrat de travail » de ton agent. Tout ce que tu n'y
-# écris pas, le modèle le décidera à ta place.
+# L'instruction est le « contrat de travail » de l'agent. Tout ce qui n'y figure
+# pas sera décidé par le modèle, sans contrôle.
 INSTRUCTION = """
 Tu es l'assistant de vente d'une boutique en ligne d'électronique. Tu réponds en
 français, de façon brève et concrète.
@@ -23,22 +23,23 @@ Règles de travail :
   jamais une référence, un prix ou une disponibilité.
 - Cite toujours la référence (SKU) du produit dont tu parles.
 
-TODO PALIER 3 — ajoute ici les garde-fous de la commande.
-Un tool qui écrit dans le monde réel sans garde-fou, c'est un accident qui
-attend son heure. Décris précisément ce que l'agent doit faire AVANT d'appeler
-create_order : vérifier le stock ? récapituler ? attendre une confirmation
-explicite de l'utilisateur ? Écris-le noir sur blanc — le modèle ne le devinera pas.
+TODO EXERCICE 3 — ajouter ici les garde-fous de la commande.
+Un tool qui écrit dans le monde réel sans garde-fou est un accident en attente.
+Décrire précisément ce que l'agent doit faire AVANT d'appeler create_order :
+vérifier le stock ? récapituler ? attendre une confirmation explicite de
+l'utilisateur ? Ces règles doivent être écrites noir sur blanc — le modèle ne
+devinera pas ce qui n'est pas formulé.
 """
 
 root_agent = LlmAgent(
-    # Modèle figé volontairement : le défaut d'ADK change au fil des versions.
+    # Modèle figé volontairement : la valeur par défaut d'ADK change selon les versions.
     model="gemini-2.5-flash",
     name="shop_agent",
     description="Assistant de vente : catalogue, stock, avis clients et commandes.",
     instruction=INSTRUCTION,
-    # TODO PALIER 1 — ajoute tes tools au fur et à mesure que tu les écris.
-    # Commence par une liste VIDE : parle d'abord à l'agent sans aucun tool, et
-    # regarde ce qu'il invente quand tu lui demandes un prix. C'est le point de
-    # départ du TP.
+    # TODO EXERCICE 1 — ajouter les tools au fur et à mesure de leur écriture.
+    # Commencer par une liste VIDE : converser d'abord avec l'agent sans aucun
+    # tool, et observer ce qu'il invente lorsqu'on lui demande un prix. C'est le
+    # point de départ du TP.
     tools=[],
 )

@@ -28,7 +28,7 @@ services:
       DATABASE_URL: postgresql://shop:shop@db:5432/shop
       SHOP_API_KEY: ${SHOP_API_KEY:-tp-adk-2026}
     ports:
-      # Depuis ton navigateur : http://localhost:8080
+      # Depuis un navigateur : http://localhost:8080
       # Depuis le conteneur agent : http://api:8000   <-- piège classique
       - "8080:8000"
     depends_on:
@@ -65,8 +65,8 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      # C'est ICI que tu travailles : édite dans ton IDE, le conteneur voit tes
-      # changements immédiatement (adk web recharge à chaque requête).
+      # Dossier de travail des élèves : l'édition se fait dans l'IDE local, le
+      # conteneur voit les modifications immédiatement (adk web les recharge).
       - ./agent/shop_agent:/app/shop_agent
     depends_on:
       api:

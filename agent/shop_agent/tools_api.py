@@ -1,18 +1,19 @@
-"""Tools qui parlent à l'API du shop — PALIERS 1 et 3.
+"""Tools qui interrogent l'API du shop — EXERCICES 1 et 3.
 
-C'est ici que tu travailles. Les conventions du TP, à respecter partout :
+Conventions à respecter dans tous les tools du TP :
 
-  1. Le NOM de la fonction et sa DOCSTRING sont ce que le LLM lit pour décider
-     s'il appelle ton tool, et avec quels arguments. Ce n'est pas du commentaire :
-     c'est la spécification que voit le modèle. Une docstring vague = un agent qui
-     appelle le mauvais tool.
-  2. Type hints obligatoires, et simples : str, int, float, bool.
-  3. Renvoie un dict contenant une clé `status` ("success" ou "error").
-  4. Erreur MÉTIER attendue (produit inconnu, rupture de stock) -> renvoie
-     {"status": "error", "message": ...}. Le LLM saura l'expliquer à l'utilisateur.
-     Erreur TECHNIQUE (API injoignable) -> laisse l'exception remonter : ADK a un
-     mécanisme de retry qu'un `except Exception:` fourre-tout désactiverait.
-  5. Borne ce que tu renvoies. Le LLM n'a pas besoin de 180 produits complets.
+  1. Le NOM de la fonction et sa DOCSTRING constituent ce que le LLM lit pour
+     décider d'appeler le tool, et avec quels arguments. Ce ne sont pas des
+     commentaires : c'est la spécification vue par le modèle. Une docstring
+     imprécise produit un agent qui appelle le mauvais tool.
+  2. Annotations de type obligatoires, et simples : str, int, float, bool.
+  3. Retourner un dict contenant une clé `status` ("success" ou "error").
+  4. Erreur MÉTIER attendue (produit inconnu, rupture de stock) -> retourner
+     {"status": "error", "message": ...}, que le LLM saura expliquer à
+     l'utilisateur. Erreur TECHNIQUE (API injoignable) -> laisser l'exception
+     remonter : ADK dispose d'un mécanisme de reprise qu'un `except Exception:`
+     générique désactiverait.
+  5. Borner le volume retourné. Le LLM n'a pas besoin de 180 produits complets.
 
 Documentation de l'API : http://localhost:8080/docs
 """
@@ -23,7 +24,7 @@ DESCRIPTION_MAX = 160
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# PALIER 1 — interroger le catalogue
+# EXERCICE 1 — interroger le catalogue
 # ──────────────────────────────────────────────────────────────────────────────
 
 
@@ -47,71 +48,71 @@ def search_products(query: str = "", category: str = "", max_price_eur: float = 
         plus grand que `count`) et `products` : une liste de produits avec leur
         sku, nom, marque, catégorie et prix en euros.
     """
-    # ↑ Cette docstring est ton MODÈLE : c'est le niveau de précision attendu
-    #   pour tous les autres tools. Lis-la avant d'écrire les tiennes.
+    # ↑ Cette docstring sert de MODÈLE : c'est le niveau de précision attendu
+    #   pour tous les autres tools. La lire avant de rédiger les suivantes.
     #
-    # TODO PALIER 1 — implémente le corps.
-    #   1. Appelle GET /products avec le client fourni :
+    # TODO EXERCICE 1 — implémenter le corps.
+    #   1. Appeler GET /products avec le client fourni :
     #          with shop_api() as client:
     #              response = client.get("/products", params=...)
     #   2. Attention : l'API attend `max_price_cents`, pas des euros.
-    #   3. Attention : la réponse contient `items` ET `total`. Ce n'est pas la
-    #      même chose. Regarde ce que renvoie l'API sur http://localhost:8080/docs
+    #   3. Attention : la réponse contient `items` ET `total`, qui ne sont pas la
+    #      même chose. Observer la réponse réelle sur http://localhost:8080/docs
     #      avant de coder.
-    #   4. Renvoie les prix en euros — le helper `euros()` est là pour ça.
-    raise NotImplementedError("Palier 1 : implémente search_products dans tools_api.py")
+    #   4. Retourner les prix en euros — le helper `euros()` est prévu pour cela.
+    raise NotImplementedError("Exercice 1 : implémenter search_products dans tools_api.py")
 
 
 def get_product(sku: str) -> dict:
-    """TODO PALIER 1 — écris la docstring de ce tool.
+    """TODO EXERCICE 1 — rédiger la docstring de ce tool.
 
-    Prends modèle sur search_products ci-dessus. Elle doit dire :
+    Prendre modèle sur search_products ci-dessus. Elle doit préciser :
       - ce que fait le tool, en une phrase ;
       - QUAND le LLM doit l'utiliser ;
-      - ce qu'est `sku` et à quoi il ressemble (donne un exemple : "AUD-0174") ;
-      - ce que contient le dict renvoyé, y compris le cas d'erreur.
+      - ce qu'est `sku` et la forme qu'il prend (avec un exemple : "AUD-0174") ;
+      - le contenu du dict retourné, y compris dans le cas d'erreur.
     """
-    # TODO PALIER 1 — implémente le corps.
-    #   - Appelle GET /products/{sku}.
-    #   - Un SKU inconnu renvoie un 404 : c'est une erreur MÉTIER attendue, donc
-    #     un dict {"status": "error", ...}, surtout pas une exception.
-    #   - Renvoie la description, mais tronquée à DESCRIPTION_MAX caractères.
-    raise NotImplementedError("Palier 1 : implémente get_product dans tools_api.py")
+    # TODO EXERCICE 1 — implémenter le corps.
+    #   - Appeler GET /products/{sku}.
+    #   - Un SKU inconnu renvoie un 404 : erreur MÉTIER attendue, donc un dict
+    #     {"status": "error", ...}, et surtout pas une exception.
+    #   - Retourner la description tronquée à DESCRIPTION_MAX caractères.
+    raise NotImplementedError("Exercice 1 : implémenter get_product dans tools_api.py")
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# PALIER 3 — historique client et passage de commande
+# EXERCICE 3 — historique client et passage de commande
 # ──────────────────────────────────────────────────────────────────────────────
 
 
 def get_customer_orders(email: str) -> dict:
-    """TODO PALIER 3 — écris la docstring.
+    """TODO EXERCICE 3 — rédiger la docstring.
 
     Ce tool liste les commandes d'un client, de la plus récente à la plus ancienne.
     """
-    # TODO PALIER 3 — implémente.
+    # TODO EXERCICE 3 — implémenter.
     #   - GET /customers/{email}/orders
     #   - Email inconnu (404) -> erreur métier.
-    #   - Montants en euros, et limite-toi aux 10 commandes les plus récentes.
-    raise NotImplementedError("Palier 3 : implémente get_customer_orders dans tools_api.py")
+    #   - Montants en euros, et limitation aux 10 commandes les plus récentes.
+    raise NotImplementedError("Exercice 3 : implémenter get_customer_orders dans tools_api.py")
 
 
 def create_order(customer_email: str, sku: str, quantity: int) -> dict:
-    """TODO PALIER 3 — écris la docstring. Celle-ci mérite un soin particulier.
+    """TODO EXERCICE 3 — rédiger la docstring. Celle-ci mérite un soin particulier.
 
-    C'est le seul tool qui MODIFIE quelque chose dans le monde réel. Ta docstring
-    doit dire explicitement au LLM qu'il s'agit d'une action irréversible et qu'il
-    ne doit pas l'appeler sans confirmation de l'utilisateur.
+    C'est le seul tool qui MODIFIE l'état du système. La docstring doit indiquer
+    explicitement au LLM qu'il s'agit d'une action irréversible, à n'appeler
+    qu'après confirmation de l'utilisateur.
     """
-    # TODO PALIER 3 — implémente.
+    # TODO EXERCICE 3 — implémenter.
     #   POST /orders avec le corps :
     #       {"customer_email": ..., "items": [{"sku": ..., "quantity": ...}]}
     #
     #   Trois erreurs métier à traiter, toutes en valeur de retour :
-    #     - 409 out_of_stock       -> dis au LLM combien d'exemplaires restent
-    #                                 (c'est dans error.details.available), il
-    #                                 pourra proposer d'en commander moins ;
+    #     - 409 out_of_stock       -> indiquer au LLM combien d'exemplaires
+    #                                 restent (error.details.available), afin
+    #                                 qu'il puisse proposer une quantité réduite ;
     #     - 404 unknown_sku / unknown_customer ;
     #     - 422                    -> la boutique refuse les quantités hors bornes
-    #                                 (1 à 100). Le LLM peut corriger lui-même.
-    raise NotImplementedError("Palier 3 : implémente create_order dans tools_api.py")
+    #                                 (1 à 100). Le LLM peut se corriger seul.
+    raise NotImplementedError("Exercice 3 : implémenter create_order dans tools_api.py")

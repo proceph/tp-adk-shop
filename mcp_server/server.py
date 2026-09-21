@@ -1,10 +1,10 @@
-"""Serveur MCP du shop — PALIER 4 (bonus).
+"""Serveur MCP du shop — EXERCICE 4 (bonus).
 
-Objectif : reprendre tes deux tools du palier 2 (check_stock, top_rated_products)
-et les publier comme un service MCP autonome, que ton agent consommera ensuite
-via un McpToolset.
+Objectif : reprendre les deux tools de l'exercice 2 (check_stock,
+top_rated_products) et les publier comme un service MCP autonome, que l'agent
+consommera ensuite via un McpToolset.
 
-Démarre-le avec : make mcp        (logs : docker compose logs -f mcp)
+Démarrage : make mcp        (logs : docker compose logs -f mcp)
 """
 
 import os
@@ -27,11 +27,11 @@ def _connect() -> psycopg.Connection:
     return psycopg.connect(SHOP_DB_URL, row_factory=dict_row)
 
 
-# TODO PALIER 4 — publie tes deux tools.
+# TODO EXERCICE 4 — publier les deux tools.
 #
 #   Le décorateur @mcp.tool() suffit : FastMCP lit la signature et la docstring
-#   de ta fonction pour construire le schéma MCP. C'est exactement la même idée
-#   que les function tools ADK — la docstring est la spécification.
+#   de la fonction pour construire le schéma MCP. Le principe est exactement
+#   celui des function tools ADK — la docstring est la spécification.
 #
 #       @mcp.tool()
 #       def check_stock(sku: str) -> dict:
@@ -42,10 +42,10 @@ def _connect() -> psycopg.Connection:
 #           """
 #           ...
 #
-#   Tu peux copier-coller le corps de tes fonctions de tools_db.py : c'est le
-#   même code métier. Seul l'emballage change. C'est tout l'intérêt de
-#   l'exercice — et la raison pour laquelle le test du palier 4 vérifie que les
-#   deux chemins renvoient bien la même chose.
+#   Le corps des fonctions de tools_db.py peut être repris tel quel : c'est le
+#   même code métier, seul l'emballage change. C'est précisément l'intérêt de
+#   l'exercice, et la raison pour laquelle l'agent doit se comporter à
+#   l'identique une fois le serveur branché.
 
 
 if __name__ == "__main__":
