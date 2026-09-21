@@ -3,10 +3,13 @@
 `adk web` recherche une variable nommée exactement `root_agent` dans ce fichier.
 La renommer fait disparaître l'agent de l'interface.
 
-Deux tools d'exemple sont déjà branchés et fonctionnels : `search_products`
-(accès par l'API) et `check_stock` (accès direct à la base). Les autres sont
-importés mais commentés dans `tools=[...]` : il suffit de les décommenter au fur
-et à mesure de leur implémentation.
+AU DÉMARRAGE DU TP, LA LISTE `tools` EST VIDE : l'agent ne dispose d'aucun
+moyen d'accéder au catalogue. C'est volontaire — l'exercice 0 consiste à
+constater ce qu'il répond dans cet état.
+
+Chaque tool s'active ensuite en décommentant UNE ligne dans `tools=[...]`, dans
+l'ordre des exercices. Deux d'entre eux sont déjà écrits et fonctionnels : il
+suffit de les décommenter. Les autres sont à implémenter avant d'être activés.
 """
 
 from google.adk.agents import LlmAgent
@@ -43,18 +46,31 @@ root_agent = LlmAgent(
     description="Assistant de vente : catalogue, stock, avis clients et commandes.",
     instruction=INSTRUCTION,
     tools=[
-        # ── Exemples fournis, déjà fonctionnels ───────────────────────────────
-        search_products,       # accès par l'API REST   (voir tools_api.py)
-        check_stock,           # accès direct à la base (voir tools_db.py)
+        # ┌──────────────────────────────────────────────────────────────────┐
+        # │ Décommenter les lignes UNE PAR UNE, dans l'ordre des exercices,  │
+        # │ et reparler à l'agent après chaque activation.                   │
+        # │                                                                  │
+        # │ Activer un tool encore marqué « à écrire » fera échouer l'agent  │
+        # │ en pleine conversation.                                          │
+        # └──────────────────────────────────────────────────────────────────┘
 
-        # ── À décommenter au fur et à mesure des exercices ────────────────────
-        # Décommenter un tool NON implémenté fait échouer l'agent en pleine
-        # conversation : n'activer chaque ligne qu'une fois le tool écrit.
-        #
-        # get_product,         # exercice 1
-        # top_rated_products,  # exercice 2
-        # get_customer_orders, # exercice 3
-        # create_order,        # exercice 3
+        # Exercice 1 — première activation. Ce tool est DÉJÀ ÉCRIT et
+        # fonctionnel : le décommenter suffit à voir l'agent changer de
+        # comportement. C'est le point de bascule du TP.
+        # search_products,
+
+        # Exercice 1 — à écrire dans tools_api.py, puis activer ici.
+        # get_product,
+
+        # Exercice 2 — également DÉJÀ ÉCRIT : accès direct à la base.
+        # check_stock,
+
+        # Exercice 2 — à écrire dans tools_db.py, puis activer ici.
+        # top_rated_products,
+
+        # Exercice 3 — à écrire dans tools_api.py, puis activer ici.
+        # get_customer_orders,
+        # create_order,
     ],
 )
 
