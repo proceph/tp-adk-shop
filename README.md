@@ -2,21 +2,29 @@
 
 **Durée : 3 h 30 · 5 exercices · Python · Agent Development Kit (ADK) 2.9**
 
-## But du TP
+## Objectif
 
-Un agent conversationnel ne connaît rien du système d'information de
-l'organisation qui le déploie. Le relier à ce système — catalogue, stocks,
-commandes — n'est pas un détail d'implémentation : c'est l'essentiel du travail,
-et c'est là que se jouent la fiabilité et la sûreté de l'agent.
+Apprendre à connecter un agent LLM à un système d'information existant, et
+mesurer l'effet de chaque décision de conception sur le comportement de l'agent.
 
-Le TP reproduit cette situation. Une boutique en ligne est en service. Un agent
-ADK est fourni, mais aveugle : il ignore tout du catalogue. L'exercice consiste à
-écrire ce qui manque entre les deux, le **connecteur**, puis à observer ce que
-chaque décision de conception change dans le comportement de l'agent.
+Plus précisément, être capable à l'issue du TP de :
 
-Aucune modification de la base ni de l'API n'est autorisée. Comme en situation
-réelle, le système existant ne s'adapte pas à l'agent : c'est à l'agent de
-savoir lui parler.
+- exposer une API REST et une base de données à un LLM sous forme de tools ADK ;
+- rédiger une docstring de tool exploitable par un modèle ;
+- distinguer erreur métier et erreur technique, et traiter chacune correctement ;
+- encadrer un tool à effet de bord par une instruction d'agent ;
+- republier un connecteur sous forme de serveur MCP.
+
+## Sujet
+
+Mise en situation : une boutique en ligne est déjà en service — base de données,
+API REST, catalogue, clients, commandes. Un agent ADK est livré avec, mais il est
+aveugle : il ignore tout de ce système.
+
+Le travail consiste à écrire ce qui manque entre les deux, le **connecteur**.
+
+Ni la base ni l'API ne peuvent être modifiées. Comme en situation réelle, le
+système existant ne s'adapte pas à l'agent : c'est à l'agent de savoir lui parler.
 
 ## Ce qui est mis à disposition
 
@@ -43,16 +51,6 @@ Six tools, une instruction d'agent et un serveur MCP, répartis sur cinq fichier
 | `agent/shop_agent/agent.py` | déclaration des tools et instruction de l'agent | 1 et 3 |
 | `mcp_server/server.py` | publication des tools en MCP | 4 (bonus) |
 | `agent/shop_agent/tools_mcp.py` | branchement du serveur MCP sur l'agent | 4 (bonus) |
-
-## Compétences visées
-
-À l'issue du TP, être capable de :
-
-- exposer une API REST et une base de données à un LLM sous forme de tools ADK ;
-- rédiger une docstring de tool exploitable par un modèle ;
-- distinguer erreur métier et erreur technique, et traiter chacune correctement ;
-- encadrer un tool à effet de bord par une instruction d'agent ;
-- republier un connecteur sous forme de serveur MCP.
 
 ## Prérequis
 
