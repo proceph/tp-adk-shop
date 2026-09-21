@@ -68,7 +68,6 @@ services:
       # C'est ICI que tu travailles : édite dans ton IDE, le conteneur voit tes
       # changements immédiatement (adk web recharge à chaque requête).
       - ./agent/shop_agent:/app/shop_agent
-      - ./tests:/app/tests
     depends_on:
       api:
         condition: service_healthy
