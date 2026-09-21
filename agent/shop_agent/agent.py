@@ -2,6 +2,11 @@
 
 `adk web` recherche une variable nommée exactement `root_agent` dans ce fichier.
 La renommer fait disparaître l'agent de l'interface.
+
+Deux tools d'exemple sont déjà branchés et fonctionnels : `search_products`
+(accès par l'API) et `check_stock` (accès direct à la base). Les autres sont
+importés mais commentés dans `tools=[...]` : il suffit de les décommenter au fur
+et à mesure de leur implémentation.
 """
 
 from google.adk.agents import LlmAgent
@@ -37,9 +42,36 @@ root_agent = LlmAgent(
     name="shop_agent",
     description="Assistant de vente : catalogue, stock, avis clients et commandes.",
     instruction=INSTRUCTION,
-    # TODO EXERCICE 1 — ajouter les tools au fur et à mesure de leur écriture.
-    # Commencer par une liste VIDE : converser d'abord avec l'agent sans aucun
-    # tool, et observer ce qu'il invente lorsqu'on lui demande un prix. C'est le
-    # point de départ du TP.
-    tools=[],
+    tools=[
+        # ── Exemples fournis, déjà fonctionnels ───────────────────────────────
+        search_products,       # accès par l'API REST   (voir tools_api.py)
+        check_stock,           # accès direct à la base (voir tools_db.py)
+
+        # ── À décommenter au fur et à mesure des exercices ────────────────────
+        # Décommenter un tool NON implémenté fait échouer l'agent en pleine
+        # conversation : n'activer chaque ligne qu'une fois le tool écrit.
+        #
+        # get_product,         # exercice 1
+        # top_rated_products,  # exercice 2
+        # get_customer_orders, # exercice 3
+        # create_order,        # exercice 3
+    ],
 )
+
+# ── EXERCICE 4 (bonus) — passer par le serveur MCP ────────────────────────────
+#
+# Une fois `mcp_server/server.py` complété et le serveur démarré (`make mcp`),
+# décommenter le bloc ci-dessous. Il retire les deux tools d'accès direct à la
+# base et les remplace par leurs équivalents servis en MCP.
+#
+# Le comportement de l'agent doit rester strictement identique : seul le mode
+# d'accès aux données change.
+#
+# from .tools_mcp import shop_mcp_toolset
+#
+# root_agent.tools = [
+#     search_products,
+#     get_customer_orders,
+#     create_order,
+#     shop_mcp_toolset,      # remplace check_stock et top_rated_products
+# ]

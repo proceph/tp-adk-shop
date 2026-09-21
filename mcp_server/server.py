@@ -27,25 +27,51 @@ def _connect() -> psycopg.Connection:
     return psycopg.connect(SHOP_DB_URL, row_factory=dict_row)
 
 
-# TODO EXERCICE 4 — publier les deux tools.
+# ══════════════════════════════════════════════════════════════════════════════
+#  EXEMPLE FOURNI — le même check_stock que dans tools_db.py, publié en MCP.
 #
-#   Le décorateur @mcp.tool() suffit : FastMCP lit la signature et la docstring
-#   de la fonction pour construire le schéma MCP. Le principe est exactement
-#   celui des function tools ADK — la docstring est la spécification.
+#  Seul l'emballage change : @mcp.tool() suffit, FastMCP lit la signature et la
+#  docstring pour construire le schéma MCP. Le code métier est identique.
+# ══════════════════════════════════════════════════════════════════════════════
+
+@mcp.tool()
+def check_stock(sku: str) -> dict:
+    """Donne le stock disponible d'un produit, entrepôt par entrepôt.
+
+    Args:
+        sku: Référence du produit, au format "AUD-0174".
+    """
+    with _connect() as conn:
+        rows = conn.execute(
+            """
+            SELECT i.warehouse,
+                   i.quantity_available - i.quantity_reserved AS sellable
+            FROM inventory i
+            JOIN products p ON p.id = i.product_id
+            WHERE p.sku = %s
+            ORDER BY sellable DESC
+            """,
+            (sku,),
+        ).fetchall()
+
+    if not rows:
+        return {"status": "error", "message": f"Aucun produit ne porte la référence {sku}."}
+
+    return {
+        "status": "success",
+        "sku": sku,
+        "total_sellable": sum(row["sellable"] for row in rows),
+        "warehouses": rows,
+    }
+
+
+# TODO EXERCICE 4 — publier le second tool sur le même modèle.
 #
-#       @mcp.tool()
-#       def check_stock(sku: str) -> dict:
-#           """Donne le stock disponible d'un produit, entrepôt par entrepôt.
-#
-#           Args:
-#               sku: Référence du produit, au format "AUD-0174".
-#           """
-#           ...
-#
-#   Le corps des fonctions de tools_db.py peut être repris tel quel : c'est le
-#   même code métier, seul l'emballage change. C'est précisément l'intérêt de
-#   l'exercice, et la raison pour laquelle l'agent doit se comporter à
-#   l'identique une fois le serveur branché.
+#   Reprendre top_rated_products en suivant exactement le modèle de check_stock
+#   ci-dessus. Le corps peut être copié depuis tools_db.py : c'est le même code
+#   métier, seul l'emballage change. C'est précisément l'intérêt de l'exercice,
+#   et la raison pour laquelle l'agent doit se comporter à l'identique une fois
+#   le serveur branché.
 
 
 if __name__ == "__main__":

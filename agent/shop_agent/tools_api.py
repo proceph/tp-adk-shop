@@ -20,12 +20,48 @@ Documentation de l'API : http://localhost:8080/docs
 
 from .config import euros, shop_api
 
+# On ne renvoie jamais les descriptions complètes au LLM : elles sont longues,
+# et 180 descriptions satureraient la fenêtre de contexte pour rien.
 DESCRIPTION_MAX = 160
+
+
+# Helper FOURNI, utilisé par les tools ci-dessous : met en forme un produit
+# renvoyé par l'API — champs utiles seulement, prix converti en euros, et
+# description tronquée lorsqu'elle est demandée.
+def _format_product(raw: dict, with_description: bool = False) -> dict:
+    formatted = {
+        "sku": raw["sku"],
+        "name": raw["name"],
+        "brand": raw["brand"],
+        "category": raw["category"],
+        "price_eur": euros(raw["price_cents"]),
+    }
+    if with_description:
+        description = raw["description"]
+        if len(description) > DESCRIPTION_MAX:
+            description = description[:DESCRIPTION_MAX].rstrip() + "…"
+        formatted["description"] = description
+    return formatted
 
 
 # ──────────────────────────────────────────────────────────────────────────────
 # EXERCICE 1 — interroger le catalogue
 # ──────────────────────────────────────────────────────────────────────────────
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  EXEMPLE FOURNI — tool complet et fonctionnel, à lire avant tout le reste.
+#
+#  Ce tool est le MODÈLE du TP. Il illustre les cinq conventions ci-dessus :
+#    · une docstring qui dit ce que fait le tool ET quand l'appeler ;
+#    · des annotations de type simples, avec des valeurs par défaut ;
+#    · la conversion euros -> centimes attendue par l'API ;
+#    · `total_matching` renvoyé en plus de `count`, pour que l'agent sache que
+#      la liste est tronquée ;
+#    · `raise_for_status()` sur les pannes, qui laisse ADK réessayer.
+#
+#  Tous les autres tools du TP se construisent sur ce patron.
+# ══════════════════════════════════════════════════════════════════════════════
 
 
 def search_products(query: str = "", category: str = "", max_price_eur: float = 0.0) -> dict:
@@ -48,20 +84,25 @@ def search_products(query: str = "", category: str = "", max_price_eur: float = 
         plus grand que `count`) et `products` : une liste de produits avec leur
         sku, nom, marque, catégorie et prix en euros.
     """
-    # ↑ Cette docstring sert de MODÈLE : c'est le niveau de précision attendu
-    #   pour tous les autres tools. La lire avant de rédiger les suivantes.
-    #
-    # TODO EXERCICE 1 — implémenter le corps.
-    #   1. Appeler GET /products avec le client fourni :
-    #          with shop_api() as client:
-    #              response = client.get("/products", params=...)
-    #   2. Attention : l'API attend `max_price_cents`, pas des euros.
-    #   3. Attention : la réponse contient `items` ET `total`, qui ne sont pas la
-    #      même chose. Observer la réponse réelle sur http://localhost:8080/docs
-    #      avant de coder.
-    #   4. Retourner les prix en euros — le helper `euros()` est prévu pour cela.
-    raise NotImplementedError("Exercice 1 : implémenter search_products dans tools_api.py")
+    params: dict = {"limit": 20}
+    if query:
+        params["q"] = query
+    if category:
+        params["category"] = category
+    if max_price_eur > 0:
+        params["max_price_cents"] = int(round(max_price_eur * 100))
 
+    with shop_api() as client:
+        response = client.get("/products", params=params)
+        response.raise_for_status()  # panne technique -> exception -> retry ADK
+        payload = response.json()
+
+    return {
+        "status": "success",
+        "count": len(payload["items"]),
+        "total_matching": payload["total"],
+        "products": [_format_product(item) for item in payload["items"]],
+    }
 
 def get_product(sku: str) -> dict:
     """TODO EXERCICE 1 — rédiger la docstring de ce tool.

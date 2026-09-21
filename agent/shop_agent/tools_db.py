@@ -19,26 +19,61 @@ Pour explorer le schéma et mettre au point les requêtes :
 from .config import db_connection, euros
 
 
+# ══════════════════════════════════════════════════════════════════════════════
+#  EXEMPLE FOURNI — tool SQL complet et fonctionnel.
+#
+#  À noter dans le code ci-dessous :
+#    · les paramètres passent par le second argument d'execute(), jamais par
+#      concaténation de chaînes ;
+#    · le stock vendable vaut quantity_available - quantity_reserved, car
+#      `quantity_available` compte aussi les articles déjà réservés ;
+#    · un SKU inconnu produit une liste vide, traitée en erreur métier et non
+#      en exception ;
+#    · le résultat est agrégé et borné : le LLM reçoit un total et un détail
+#      court, pas un dump de la table.
+# ══════════════════════════════════════════════════════════════════════════════
+
+
 def check_stock(sku: str) -> dict:
-    """TODO EXERCICE 2 — rédiger la docstring.
+    """Donne le stock disponible d'un produit, entrepôt par entrepôt.
 
-    Ce tool donne le stock disponible d'un produit, entrepôt par entrepôt.
-    Préciser au LLM qu'il doit l'utiliser AVANT toute commande.
+    Utilise ce tool quand l'utilisateur demande si un article est disponible,
+    en stock, ou livrable — et systématiquement avant de passer une commande.
+
+    Args:
+        sku: Référence du produit, au format "AUD-0174".
+
+    Returns:
+        Un dict avec `status`, `total_sellable` (quantité réellement commandable,
+        tous entrepôts confondus) et `warehouses` (le détail par entrepôt).
+        Si le SKU est inconnu, `status` vaut "error".
     """
-    # TODO EXERCICE 2 — implémenter.
-    #   Table `inventory`, jointure sur `products` pour retrouver le SKU.
-    #
-    #   PIÈGE : `quantity_available` inclut les articles déjà réservés par
-    #   d'autres commandes. Le stock réellement commandable vaut
-    #   quantity_available - quantity_reserved.
-    #
-    #   Usage de la connexion :
-    #       with db_connection() as conn:
-    #           rows = conn.execute("SELECT ...", (sku,)).fetchall()
-    #   Les lignes sont des dictionnaires. Passer TOUJOURS les paramètres par le
-    #   second argument : ne jamais construire le SQL par concaténation.
-    raise NotImplementedError("Exercice 2 : implémenter check_stock dans tools_db.py")
+    with db_connection() as conn:
+        rows = conn.execute(
+            """
+            SELECT i.warehouse,
+                   i.quantity_available,
+                   i.quantity_reserved,
+                   i.quantity_available - i.quantity_reserved AS sellable
+            FROM inventory i
+            JOIN products p ON p.id = i.product_id
+            WHERE p.sku = %s
+            ORDER BY sellable DESC
+            """,
+            (sku,),
+        ).fetchall()
 
+    if not rows:
+        return {"status": "error", "message": f"Aucun produit ne porte la référence {sku}."}
+
+    return {
+        "status": "success",
+        "sku": sku,
+        "total_sellable": sum(row["sellable"] for row in rows),
+        "warehouses": [
+            {"warehouse": row["warehouse"], "sellable": row["sellable"]} for row in rows
+        ],
+    }
 
 def top_rated_products(category: str = "", limit: int = 5) -> dict:
     """TODO EXERCICE 2 — rédiger la docstring.
