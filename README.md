@@ -346,7 +346,9 @@ déclaré, rien n'est à y écrire.
 
 1. Ajouter `top_rated_products` dans `mcp_server/server.py`, sur le modèle de
    `check_stock`. Le corps peut être repris tel quel depuis `tools_db.py`.
-2. Démarrer le serveur : `make mcp`.
+2. Démarrer le serveur : `make mcp`. **Relancer cette commande après chaque
+   modification de `server.py`** : le serveur lit le fichier au démarrage et ne
+   le relit jamais, contrairement aux tools de l'agent.
 3. Décommenter le bloc MCP en fin d'`agent.py` : il remplace les deux tools
    d'accès direct à la base par leurs équivalents servis en MCP.
 
@@ -370,6 +372,7 @@ appels transitent désormais par le serveur MCP.
 | L'agent n'appelle jamais un tool | La docstring n'indique pas *quand* l'utiliser. Relire celle de `search_products`. |
 | `401 unauthorized` | Passer par `shop_api()`, qui transmet la clé d'API. |
 | L'agent disparaît de l'interface | Erreur de syntaxe dans un fichier. Consulter `make logs`. |
+| Le serveur MCP ignore une modification | Il ne recharge pas `server.py` tout seul : relancer `make mcp`. |
 | Stock qui diminue sans raison | Les essais de commande réservent du stock. Lancer `make reset`. |
 | Client SQL connecté mais aucune table | Champ *Database* laissé à `postgres` : la connexion réussit sur une base vide. Saisir `shop`. |
 | Client SQL : connexion refusée | Port `8081` (Adminer) au lieu de `5432`, ou hôte `db` au lieu de `localhost`. |
