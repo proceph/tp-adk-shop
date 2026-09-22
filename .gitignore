@@ -3,3 +3,6 @@ __pycache__/
 *.pyc
 .pytest_cache/
 .venv/
+
+# Base de sessions créée par adk web dans le dossier monté
+.adk/
