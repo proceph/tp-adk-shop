@@ -35,7 +35,7 @@ l'utilisateur et propose une solution — par exemple une alternative en stock.
 
 root_agent = LlmAgent(
     # Modèle figé volontairement : le défaut d'ADK change au fil des versions.
-    model="gemini-2.5-flash",
+    model="gemini-3.6-flash",
     name="shop_agent",
     description="Assistant de vente : catalogue, stock, avis clients et commandes.",
     instruction=INSTRUCTION,
