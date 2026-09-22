@@ -40,8 +40,10 @@ devinera pas ce qui n'est pas formulé.
 """
 
 root_agent = LlmAgent(
-    # Modèle figé volontairement : la valeur par défaut d'ADK change selon les versions.
-    model="gemini-2.5-flash",
+    # Modèle figé volontairement : la valeur par défaut d'ADK change selon les
+    # versions. gemini-2.5-flash n'est plus accessible aux clés créées
+    # récemment ; Google oriente les nouveaux comptes vers gemini-3.6-flash.
+    model="gemini-3.6-flash",
     name="shop_agent",
     description="Assistant de vente : catalogue, stock, avis clients et commandes.",
     instruction=INSTRUCTION,
