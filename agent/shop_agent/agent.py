@@ -57,7 +57,7 @@ root_agent = LlmAgent(
         # Exercice 1 — première activation. Ce tool est DÉJÀ ÉCRIT et
         # fonctionnel : le décommenter suffit à voir l'agent changer de
         # comportement. C'est le point de bascule du TP.
-        # search_products,
+        search_products,
 
         # Exercice 1 — à écrire dans tools_api.py, puis activer ici.
         # get_product,
