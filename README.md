@@ -208,25 +208,24 @@ Dans `agent.py`, décommenter cette unique ligne de `tools=[...]` :
 Puis reposer à l'agent **exactement la même question** qu'à l'exercice 0, dans
 une nouvelle conversation. Comparer avec la réponse notée précédemment.
 
-C'est le point de bascule du TP : une ligne décommentée sépare un modèle qui
-invente d'un agent qui consulte un système réel. Observer aussi *comment* le
-modèle s'en sert — demander « et en moins cher ? » montre qu'il rappelle le tool
-avec d'autres arguments, sans qu'on le lui ait demandé.
+L'agent appelle intelligemment le tool `search_products` avec les bons
+arguments, sans qu'on lui ait explicitement indiqué de s'en servir.
 
 > Si le changement ne semble pas pris en compte, lancer `make restart`, puis
 > ouvrir une nouvelle conversation.
 
 ### Étape 2 — lire l'exemple
 
+Dans `tools_api.py` :
+
 ```python
 def search_products(query: str = "", category: str = "", max_price_eur: float = 0.0) -> dict
 ```
 
-Maintenant que son effet est visible, lire ce tool intégralement. Il condense
-tout ce que le TP demande : une docstring qui précise *quand* l'appeler, la
-conversion euros → centimes attendue par l'API, `total_matching` renvoyé pour
-signaler une liste tronquée, et `raise_for_status()` qui laisse ADK réessayer
-en cas de panne.
+Sa docstring déclare *quand* appeler le tool `search_products`. Son corps
+illustre le reste : la conversion euros → centimes attendue par l'API,
+`total_matching` renvoyé pour signaler une liste tronquée, et
+`raise_for_status()` qui laisse ADK réessayer en cas de panne.
 
 ### Étape 3 — à implémenter
 
@@ -236,14 +235,6 @@ def get_product(sku: str) -> dict
 
 La docstring est à rédiger, sur le modèle de `search_products`. Puis
 décommenter `get_product` dans `tools=[...]`, et vérifier en conversant.
-
-### Points d'attention
-
-- Un SKU inconnu renvoie un **404**. C'est une réponse normale de la boutique :
-  elle se traite en valeur de retour, pas en exception.
-- La fiche détaillée inclut la description, que l'exemple tronque à
-  `DESCRIPTION_MAX` caractères. Renvoyer des descriptions complètes permet de
-  mesurer l'effet d'une réponse trop volumineuse sur la qualité de l'agent.
 
 ### Vérification
 
