@@ -23,7 +23,7 @@ Le client fourni par `shop_api()` la transmet automatiquement.
 
 | Paramètre | Type | Défaut | Note |
 |---|---|---|---|
-| `q` | texte | — | cherché dans le nom **et** la marque |
+| `q` | mots-clés | — | chaque mot doit apparaître dans le nom **ou** la marque, ordre indifférent |
 | `category` | slug | — | `audio`, `informatique`, `photo`, `maison-connectee`, `sport`, `gaming`, `telephonie`, `accessoires` |
 | `max_price_cents` | entier | — | **en centimes** |
 | `limit` | entier | **20** | maximum 100 |

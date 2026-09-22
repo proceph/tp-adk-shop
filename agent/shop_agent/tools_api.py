@@ -42,8 +42,11 @@ def search_products(query: str = "", category: str = "", max_price_eur: float = 
     existe dans une gamme, ou pose une question sur les prix du catalogue.
 
     Args:
-        query: Texte libre cherché dans le nom et la marque, par exemple "casque"
-            ou "Aurora". Laisser vide pour ne pas filtrer sur le texte.
+        query: Mots-clés cherchés dans le nom et la marque, par exemple
+            "casque", "Aurora" ou "casque Orion". Chaque mot doit apparaître,
+            dans n'importe quel ordre. Employer des mots-clés et jamais une
+            phrase entière : "je cherche un casque pas cher" ne renvoie rien.
+            Laisser vide pour ne pas filtrer sur le texte.
         category: Catégorie exacte parmi : audio, informatique, photo,
             maison-connectee, sport, gaming, telephonie, accessoires.
             Laisser vide pour toutes les catégories.

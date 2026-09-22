@@ -28,8 +28,13 @@ def search_products(
     """
     where, params = [], []
     if q:
-        where.append("(p.name ILIKE %s OR p.brand ILIKE %s)")
-        params += [f"%{q}%", f"%{q}%"]
+        # Recherche par mots-clés : chaque mot doit apparaître dans le nom ou la
+        # marque, sans contrainte d'ordre ni de contiguïté. « casque Orion Air »
+        # retrouve ainsi « Casque filaire Orion Air », ce qu'une recherche de
+        # sous-chaîne littérale manquerait.
+        for terme in q.split():
+            where.append("(p.name ILIKE %s OR p.brand ILIKE %s)")
+            params += [f"%{terme}%", f"%{terme}%"]
     if category:
         where.append("c.slug = %s")
         params.append(category)
