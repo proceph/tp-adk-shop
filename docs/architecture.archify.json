@@ -1,0 +1,291 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "TP ADK — architecture et adressage réseau",
+    "output": "architecture.html",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1290,
+      690
+    ],
+    "views": [
+      {
+        "id": "adressage",
+        "label": "Les deux adressages",
+        "focus": [
+          "nav",
+          "sqlcli",
+          "agent",
+          "api",
+          "adminer",
+          "db"
+        ]
+      },
+      {
+        "id": "tools-api",
+        "label": "Exercices 1 et 3 — API",
+        "focus": [
+          "agent",
+          "api",
+          "db"
+        ]
+      },
+      {
+        "id": "tools-db",
+        "label": "Exercice 2 — SQL direct",
+        "focus": [
+          "agent",
+          "db"
+        ]
+      },
+      {
+        "id": "chemin-mcp",
+        "label": "Exercice 4 — MCP",
+        "focus": [
+          "agent",
+          "mcp",
+          "db"
+        ]
+      },
+      {
+        "id": "appel-modele",
+        "label": "L'appel au modèle",
+        "focus": [
+          "agent",
+          "gemini"
+        ]
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "nav",
+      "type": "external",
+      "label": "Navigateur",
+      "sublabel": "poste de travail",
+      "pos": [
+        360,
+        40
+      ],
+      "size": [
+        190,
+        70
+      ]
+    },
+    {
+      "id": "sqlcli",
+      "type": "external",
+      "label": "Client SQL",
+      "sublabel": "DBeaver, psql",
+      "pos": [
+        1040,
+        40
+      ],
+      "size": [
+        190,
+        70
+      ]
+    },
+    {
+      "id": "api",
+      "type": "backend",
+      "label": "api",
+      "sublabel": "FastAPI :8000",
+      "pos": [
+        640,
+        195
+      ],
+      "size": [
+        170,
+        70
+      ]
+    },
+    {
+      "id": "adminer",
+      "type": "frontend",
+      "label": "adminer",
+      "sublabel": "interface web :8080",
+      "pos": [
+        870,
+        195
+      ],
+      "size": [
+        170,
+        70
+      ]
+    },
+    {
+      "id": "gemini",
+      "type": "cloud",
+      "brand": "google-gemini",
+      "label": "Gemini API",
+      "sublabel": "API Google AI Studio",
+      "tag": "gemini-3.6-flash",
+      "pos": [
+        40,
+        360
+      ],
+      "size": [
+        220,
+        80
+      ]
+    },
+    {
+      "id": "agent",
+      "type": "backend",
+      "label": "agent",
+      "sublabel": "adk web :8000",
+      "pos": [
+        360,
+        360
+      ],
+      "size": [
+        200,
+        80
+      ]
+    },
+    {
+      "id": "db",
+      "type": "database",
+      "label": "db",
+      "sublabel": "PostgreSQL :5432",
+      "pos": [
+        1060,
+        360
+      ],
+      "size": [
+        170,
+        80
+      ]
+    },
+    {
+      "id": "mcp",
+      "type": "backend",
+      "label": "mcp",
+      "sublabel": "streamable-http :9000",
+      "pos": [
+        640,
+        545
+      ],
+      "size": [
+        180,
+        70
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Internet",
+      "wraps": [
+        "gemini"
+      ],
+      "pad": 20
+    },
+    {
+      "kind": "region",
+      "label": "Poste de travail — Docker s'exécute dessus",
+      "wraps": [
+        "nav",
+        "sqlcli",
+        "agent",
+        "api",
+        "adminer",
+        "mcp",
+        "db"
+      ],
+      "pad": 40
+    },
+    {
+      "kind": "security-group",
+      "label": "Réseau Docker tp-adk-shop_default",
+      "wraps": [
+        "agent",
+        "api",
+        "adminer",
+        "mcp",
+        "db"
+      ],
+      "pad": 18
+    }
+  ],
+  "connections": [
+    {
+      "id": "agent-gemini",
+      "from": "agent",
+      "to": "gemini",
+      "label": "HTTPS · GOOGLE_API_KEY",
+      "variant": "security",
+      "labelDy": 68
+    },
+    {
+      "id": "nav-agent",
+      "from": "nav",
+      "to": "agent",
+      "label": "localhost:8000",
+      "variant": "emphasis",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "nav-api",
+      "from": "nav",
+      "to": "api",
+      "label": "localhost:8080/docs"
+    },
+    {
+      "id": "nav-adminer",
+      "from": "nav",
+      "to": "adminer",
+      "label": "localhost:8081"
+    },
+    {
+      "id": "sqlcli-db",
+      "from": "sqlcli",
+      "to": "db",
+      "label": "localhost:5432",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "agent-api",
+      "from": "agent",
+      "to": "api",
+      "label": "api:8000 · X-API-Key",
+      "variant": "security"
+    },
+    {
+      "id": "agent-db",
+      "from": "agent",
+      "to": "db",
+      "label": "db:5432 · lecture seule",
+      "labelDx": 170
+    },
+    {
+      "id": "agent-mcp",
+      "from": "agent",
+      "to": "mcp",
+      "label": "mcp:9000/mcp · exercice 4",
+      "variant": "dashed"
+    },
+    {
+      "id": "api-db",
+      "from": "api",
+      "to": "db",
+      "label": "db:5432 · lecture et écriture"
+    },
+    {
+      "id": "adminer-db",
+      "from": "adminer",
+      "to": "db",
+      "label": "db:5432"
+    },
+    {
+      "id": "mcp-db",
+      "from": "mcp",
+      "to": "db",
+      "label": "db:5432 · lecture seule"
+    }
+  ]
+}
