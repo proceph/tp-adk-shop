@@ -6,3 +6,6 @@ __pycache__/
 
 # Base de sessions créée par adk web dans le dossier monté
 .adk/
+
+# Fichiers système macOS
+.DS_Store
