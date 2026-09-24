@@ -77,6 +77,9 @@ make up                       # démarrage de la boutique
 
 `make` sans argument liste toutes les commandes disponibles.
 
+`make` n'est pas installé par défaut sur Windows. Toutes les commandes du TP ont
+un équivalent `docker compose` direct : voir l'annexe **Sans make**.
+
 ### Services
 
 | Adresse | Service |
@@ -398,6 +401,54 @@ d'accès aux données change, pas les données elles-mêmes.
 Reposer les deux questions de l'exercice 2. Les réponses doivent être
 identiques : seul le chemin d'accès a changé. `make logs` confirme que les
 appels transitent désormais par le serveur MCP.
+
+---
+
+## Annexe — Sans make
+
+`make` n'apporte rien d'autre que des raccourcis. Chaque cible correspond à une
+commande `docker compose`, à lancer depuis la racine du dépôt.
+
+| Raccourci | Commande équivalente |
+|---|---|
+| `make up` | `docker compose up -d --build` |
+| `make down` | `docker compose --profile mcp down` |
+| `make logs` | `docker compose logs -f agent` |
+| `make logs-all` | `docker compose --profile mcp logs -f` |
+| `make restart` | `docker compose restart agent` |
+| `make shell` | `docker compose exec agent bash` |
+| `make mcp` | `docker compose --profile mcp up -d --build --force-recreate mcp` |
+| `make reset` | `docker compose --profile mcp down -v` puis `docker compose up -d --build` |
+
+`make preflight` ne fait que deux choses : vérifier que `GOOGLE_API_KEY` est
+renseignée dans `.env`, puis télécharger les images.
+
+```
+docker compose --profile mcp build
+docker compose pull db adminer
+```
+
+### Création du fichier .env sous Windows
+
+`cp` n'existe pas dans PowerShell ni dans l'invite de commandes :
+
+| Terminal | Commande |
+|---|---|
+| PowerShell | `Copy-Item .env.example .env` |
+| Invite de commandes | `copy .env.example .env` |
+| Git Bash, WSL | `cp .env.example .env` |
+
+Éditer ensuite `.env` pour y coller la clé Google AI Studio.
+
+### Remarques Windows
+
+- Docker Desktop doit tourner avec le moteur **WSL 2**, son réglage par défaut.
+- Lancer les commandes depuis la racine du dépôt, celle qui contient
+  `docker-compose.yml`.
+- Les adresses restent identiques : `localhost:8000`, `localhost:8080`,
+  `localhost:8081`.
+- Un antivirus qui inspecte les volumes montés peut ralentir la prise en compte
+  des modifications. En cas de doute, `docker compose restart agent`.
 
 ---
 
