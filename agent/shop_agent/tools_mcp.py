@@ -5,7 +5,7 @@ dans `mcp_server/server.py`.
 
 Les tools de l'exercice 2 ne sont utilisables que depuis cet agent ADK. Un
 serveur MCP, lui, est un service autonome que tout client compatible peut
-consommer : un agent ADK, un IDE, Claude Code, ou l'agent d'un tiers écrit dans
+consommer : un agent ADK, un IDE, un assistant de code, ou l'agent d'un tiers
 un autre framework. C'est la différence entre écrire une fonction et publier
 une API.
 

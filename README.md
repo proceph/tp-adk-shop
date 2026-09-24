@@ -367,7 +367,7 @@ signale une instruction insuffisante.
 
 Les tools de l'exercice 2 ne sont utilisables que depuis cet agent ADK. Un
 serveur MCP expose le même code métier sous forme de service autonome,
-consommable par tout client compatible : un agent ADK, un IDE, Claude Code, ou
+consommable par tout client compatible : un agent ADK, un IDE, un assistant de code, ou
 l'agent d'un tiers écrit dans un autre framework. C'est la différence entre
 écrire une fonction et publier une API.
 

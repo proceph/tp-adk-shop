@@ -4,7 +4,7 @@ Mêmes capacités que les tools de l'exercice 2, autre emballage.
 
 Un function tool ADK ne vit que dans l'agent qui le déclare. Un serveur MCP est
 un service autonome que tout client compatible peut consommer : cet agent ADK,
-mais aussi Claude Code, un IDE, ou l'agent d'un tiers écrit dans un autre
+mais aussi un assistant de code, un IDE, ou l'agent d'un tiers écrit dans un autre
 framework. C'est la différence entre écrire une fonction et publier une API.
 
 Ce serveur parle le transport `streamable-http` et écoute sur http://mcp:9000/mcp.
