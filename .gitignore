@@ -9,3 +9,6 @@ __pycache__/
 
 # Fichiers système macOS
 .DS_Store
+
+# Notes enseignant : jamais publiées
+ENSEIGNANT.md
