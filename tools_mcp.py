@@ -1,7 +1,7 @@
 """Branchement du serveur MCP sur l'agent — EXERCICE 4 (bonus).
 
-EXEMPLE FOURNI : ce fichier est complet et fonctionnel, rien n'est à y écrire.
-Le travail de l'exercice 4 se situe dans `mcp_server/server.py`.
+Ce fichier est fourni complet aux élèves : le travail de l'exercice 4 se situe
+dans `mcp_server/server.py`.
 
 Les tools de l'exercice 2 ne sont utilisables que depuis cet agent ADK. Un
 serveur MCP, lui, est un service autonome que tout client compatible peut
